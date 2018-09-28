@@ -7,7 +7,7 @@
 
     <string name="header_act_details">Похожие фильмы</string>
 
+    <string name="action_uri_trailer">Трейлер</string>
     <string name="action_uri_kuda_go">Сайт KudaGo</string>
-    <string name="action_uri_imdb">Сайт IMDB</string>
 
 </resources>

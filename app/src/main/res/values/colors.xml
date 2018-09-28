@@ -4,8 +4,8 @@
     <color name="ic_launcher_background">#e83c3c</color>
     <color name="fab_search">#e83c3c</color>
 
-    <color name="background_gradient_start">#272727</color>
-    <color name="background_gradient_end">#757575</color>
+    <color name="background_default_start">#272727</color>
+    <color name="background_default_end">#757575</color>
 
     <color name="background_fastlane">#272727</color>
 

@@ -11,6 +11,7 @@ import android.support.annotation.Nullable;
 import android.support.v17.leanback.app.BackgroundManager;
 import android.support.v17.leanback.app.BrowseSupportFragment;
 import android.support.v17.leanback.widget.*;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import com.squareup.picasso.Picasso;
@@ -104,7 +105,7 @@ public class FrgMain extends BrowseSupportFragment implements OnItemViewClickedL
     private BackgroundManager backgroundManager;
 
     private Drawable backgroundDefault;
-    private int widthWindow, heightWindow;
+    private int windowWidth, windowHeight;
 
     private void setupBackgroundManager() {
         Log.i(TAG, "setupBackgroundManager");
@@ -117,8 +118,8 @@ public class FrgMain extends BrowseSupportFragment implements OnItemViewClickedL
         DisplayMetrics metrics = new DisplayMetrics();
         activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
 
-        widthWindow = metrics.widthPixels;
-        heightWindow = metrics.heightPixels;
+        windowWidth = metrics.widthPixels;
+        windowHeight = metrics.heightPixels;
     }
 
     private void setupUI() {
@@ -158,7 +159,7 @@ public class FrgMain extends BrowseSupportFragment implements OnItemViewClickedL
     }
 
     private Timer backgroundTimer;
-    private ItemFilm currentItemFilm;
+    private ItemFilm selectedFilm;
     private boolean needChange = false;
 
     private void startBackgroundTimer(int duration) {
@@ -180,8 +181,8 @@ public class FrgMain extends BrowseSupportFragment implements OnItemViewClickedL
             Log.i(TAG, "run");
 
             handler.post(() -> {
-                if (currentItemFilm != null && needChange) {
-                    updateBackground(currentItemFilm);
+                if (selectedFilm != null && needChange) {
+                    updateBackground(selectedFilm);
                 }
             });
         }
@@ -192,7 +193,7 @@ public class FrgMain extends BrowseSupportFragment implements OnItemViewClickedL
 
         Picasso.get()
                 .load(itemFilm.getImages().toString())
-                .resize(widthWindow, heightWindow)
+                .resize(windowWidth, windowHeight)
                 .centerCrop()
                 .error(R.drawable.bg_default)
                 .placeholder(R.drawable.bg_default)
@@ -226,13 +227,13 @@ public class FrgMain extends BrowseSupportFragment implements OnItemViewClickedL
             Intent intent = new Intent(activity, ActDetails.class);
             intent.putExtra(DefFilm.INTENT, itemFilm);
 
-            activity.startActivity(intent);
+            ImageCardView view = (ImageCardView) viewHolder.view;
+            Bundle bundle = ActivityOptionsCompat
+                    .makeSceneTransitionAnimation(activity, view.getMainImageView(), DefFilm.SHARED_ELEMENT)
+                    .toBundle();
+
+            activity.startActivity(intent, bundle);
         }
-//        ImageCardView view = (ImageCardView) viewHolder.view;
-//        Bundle bundle = ActivityOptionsCompat
-//                .makeSceneTransitionAnimation(activity, view.getMainImageView(), DefFilm.SHARED_ELEMENT)
-//                .toBundle();
-        // TODO: 28.09.2018 как в гайде (на конец)
     }
 
     @Override
@@ -240,7 +241,7 @@ public class FrgMain extends BrowseSupportFragment implements OnItemViewClickedL
         Log.i(TAG, "onItemSelected");
 
         if (o instanceof ItemFilm) {
-            currentItemFilm = (ItemFilm) o;
+            selectedFilm = (ItemFilm) o;
 
             startBackgroundTimer(getResources().getInteger(R.integer.duration_background_change));
         }

@@ -72,6 +72,7 @@ public class PresenterFilm extends Presenter {
         Picasso.get()
                 .load(itemFilm.getPoster().toString())
                 .resize(cardWidth, cardHeight)
+                .placeholder(R.drawable.ic_default)
                 .centerCrop()
                 .into(cardView.getMainImageView());
 
