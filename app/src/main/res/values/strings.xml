@@ -1,0 +1,13 @@
+<resources>
+
+    <string name="app_name">KudaGo Films</string>
+
+    <string name="title_act_main">Фильмы</string>
+    <string name="title_act_details">Подробнее</string>
+
+    <string name="header_act_details">Похожие фильмы</string>
+
+    <string name="action_uri_kuda_go">Сайт KudaGo</string>
+    <string name="action_uri_imdb">Сайт IMDB</string>
+
+</resources>

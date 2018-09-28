@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="ic_launcher_background">#e83c3c</color>
+    <color name="fab_search">#e83c3c</color>
+
+    <color name="background_gradient_start">#272727</color>
+    <color name="background_gradient_end">#757575</color>
+
+    <color name="background_fastlane">#272727</color>
+
+    <color name="background_details_default">#272727</color>
+    <color name="background_details_selected">#fd4c2a</color>
+
+    <color name="text">#fafafa</color>
+
+</resources>

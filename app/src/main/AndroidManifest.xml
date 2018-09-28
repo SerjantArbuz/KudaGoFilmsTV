@@ -1,0 +1,46 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="sgtmelon.kudagofilmstv">
+
+    <uses-permission android:name="android.permission.INTERNET"/>
+
+    <uses-feature
+            android:name="android.software.leanback"
+            android:required="true"/>
+
+    <uses-feature
+            android:name="android.hardware.touchscreen"
+            android:required="false"/>
+
+    <application
+            android:allowBackup="true"
+            android:banner="@drawable/ic_app"
+            android:icon="@drawable/ic_app"
+            android:label="@string/app_name"
+            android:supportsRtl="true"
+            android:theme="@style/AppTheme">
+
+        <activity
+                android:name=".ui.ActMain"
+                android:icon="@drawable/ic_app"
+                android:label="@string/title_act_main"
+                android:logo="@drawable/ic_app">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER"/>
+            </intent-filter>
+        </activity>
+
+        <activity
+                android:name=".ui.ActDetails"
+                android:icon="@drawable/ic_app"
+                android:label="@string/title_act_details"
+                android:logo="@drawable/ic_app">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
+
+    </application>
+
+</manifest>
