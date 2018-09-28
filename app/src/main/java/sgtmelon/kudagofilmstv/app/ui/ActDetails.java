@@ -1,4 +1,4 @@
-package sgtmelon.kudagofilmstv.ui;
+package sgtmelon.kudagofilmstv.app.ui;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;

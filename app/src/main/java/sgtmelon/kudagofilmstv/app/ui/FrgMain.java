@@ -1,4 +1,4 @@
-package sgtmelon.kudagofilmstv.ui;
+package sgtmelon.kudagofilmstv.app.ui;
 
 
 import android.content.Context;
@@ -11,15 +11,21 @@ import android.support.annotation.Nullable;
 import android.support.v17.leanback.app.BackgroundManager;
 import android.support.v17.leanback.app.BrowseSupportFragment;
 import android.support.v17.leanback.widget.*;
-import android.support.v4.app.ActivityOptionsCompat;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.widget.Toast;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import sgtmelon.kudagofilmstv.R;
-import sgtmelon.kudagofilmstv.annot.DefFilm;
-import sgtmelon.kudagofilmstv.model.ItemFilm;
-import sgtmelon.kudagofilmstv.presenter.PresenterFilm;
+import sgtmelon.kudagofilmstv.app.model.ItemFilm;
+import sgtmelon.kudagofilmstv.app.model.RepoFilm;
+import sgtmelon.kudagofilmstv.app.model.RepoServer;
+import sgtmelon.kudagofilmstv.app.presenter.PresenterFilm;
+import sgtmelon.kudagofilmstv.office.annot.DefServer;
+import sgtmelon.kudagofilmstv.office.annot.DefTransition;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -49,35 +55,17 @@ public class FrgMain extends BrowseSupportFragment implements OnItemViewClickedL
 
         setupBackgroundManager();
         setupUI();
-        loadRows();
+        setupRow();
+
+        RepoServer repoServer = new RepoServer();
+        repoServer.getApi()
+                .getListFilm(/*0, 100, DefServer.field_title, DefServer.text_format_text*/)
+                .enqueue(serverCallback);
+
+        Log.i(TAG, "onActivityCreated: " + DefServer.baseUrl + DefServer.extraUrl + "?" + DefServer.fields + "=" + DefServer.field);
 
         setOnItemViewClickedListener(this);
         setOnItemViewSelectedListener(this);
-
-        setBrowseTransitionListener(new BrowseTransitionListener() {
-            @Override
-            public void onHeadersTransitionStart(boolean withHeaders) {
-                Log.i(TAG, "onHeadersTransitionStart: " + withHeaders);
-
-                if (withHeaders) {
-                    needChange = false;
-
-                    if (backgroundTimer != null) {
-                        backgroundTimer.cancel();
-                        backgroundManager.setDrawable(backgroundDefault);
-                    }
-                } else {
-                    needChange = true;
-
-                    startBackgroundTimer(getResources().getInteger(R.integer.duration_background_change));
-                }
-            }
-
-            @Override
-            public void onHeadersTransitionStop(boolean withHeaders) {
-
-            }
-        });
     }
 
     @Override
@@ -136,31 +124,68 @@ public class FrgMain extends BrowseSupportFragment implements OnItemViewClickedL
         backgroundManager.setDrawable(backgroundDefault);
     }
 
-    ArrayObjectAdapter adpRows;
+    private void setupRow() {
+        adapter = new ArrayObjectAdapter(new ListRowPresenter());
 
-    private void loadRows() {
-        Log.i(TAG, "loadRows");
+//        PresenterFilm presenterFilm = new PresenterFilm(context);
+//        ArrayObjectAdapter adpGridRow = new ArrayObjectAdapter(presenterFilm);
+//
+//        for (int i = 1; i < 4; i++) {
+//            HeaderItem headerItem = new HeaderItem(i, "Заголовок " + i);
+//            for (int j = 0; j < 5; j++) {
+//                ItemFilm itemFilm = new ItemFilm();
+//                adpGridRow.add(itemFilm);
+//            }
+//            adapter.add(new ListRow(headerItem, adpGridRow));
+//        }
 
-        adpRows = new ArrayObjectAdapter(new ListRowPresenter());
+        setAdapter(adapter);
+    }
 
-        HeaderItem headerItem = new HeaderItem(0, "Header");
+    ArrayObjectAdapter adapter;
 
-        PresenterFilm presenterFilm = new PresenterFilm(context);
-        ArrayObjectAdapter adpGridRow = new ArrayObjectAdapter(presenterFilm);
+    Callback<RepoFilm> serverCallback = new Callback<RepoFilm>() {
+        @Override
+        public void onResponse(Call<RepoFilm> call, Response<RepoFilm> response) {
+            Log.i(TAG, "onResponse");
 
-        for (int i = 0; i < 10; i++) {
-            ItemFilm itemFilm = new ItemFilm();
-            adpGridRow.add(itemFilm);
+            PresenterFilm presenterFilm = new PresenterFilm(context);
+
+            for (int i = 0; i < 3; i++) {
+                ArrayObjectAdapter adpGridRow = new ArrayObjectAdapter(presenterFilm);
+                HeaderItem headerItem = new HeaderItem(i, "Заголовок " + i);
+                for (int j = 0; j < 5; j++) {
+                    ItemFilm itemFilm = new ItemFilm();
+                    adpGridRow.add(itemFilm);
+                }
+                adapter.add(new ListRow(headerItem, adpGridRow));
+            }
+
+            if (response.body() != null) {
+                Log.i(TAG, "onResponse != null");
+
+                ArrayObjectAdapter adpGridRow = new ArrayObjectAdapter(presenterFilm);
+                HeaderItem headerItem = new HeaderItem(3, "Все фильмы");
+
+                for (ItemFilm itemFilm : response.body().getListFilm()) {
+                    adpGridRow.add(itemFilm);
+                }
+
+                adapter.add(new ListRow(headerItem, adpGridRow));
+            }
+
+            adapter.notifyArrayItemRangeChanged(0, adapter.size());
         }
 
-        adpRows.add(new ListRow(headerItem, adpGridRow));
+        @Override
+        public void onFailure(Call<RepoFilm> call, Throwable t) {
+            Toast.makeText(context, getString(R.string.error_internet), Toast.LENGTH_LONG).show();
+        }
 
-        setAdapter(adpRows);
-    }
+    };
 
     private Timer backgroundTimer;
     private ItemFilm selectedFilm;
-    private boolean needChange = false;
 
     private void startBackgroundTimer(int duration) {
         Log.i(TAG, "startBackgroundTimer");
@@ -179,13 +204,13 @@ public class FrgMain extends BrowseSupportFragment implements OnItemViewClickedL
         @Override
         public void run() {
             Log.i(TAG, "run");
-
             handler.post(() -> {
-                if (selectedFilm != null && needChange) {
+                if (selectedFilm != null) {
                     updateBackground(selectedFilm);
                 }
             });
         }
+
     }
 
     private void updateBackground(ItemFilm itemFilm) {
@@ -225,14 +250,9 @@ public class FrgMain extends BrowseSupportFragment implements OnItemViewClickedL
             ItemFilm itemFilm = (ItemFilm) o;
 
             Intent intent = new Intent(activity, ActDetails.class);
-            intent.putExtra(DefFilm.INTENT, itemFilm);
+            intent.putExtra(DefTransition.INTENT_FILM, itemFilm);
 
-            ImageCardView view = (ImageCardView) viewHolder.view;
-            Bundle bundle = ActivityOptionsCompat
-                    .makeSceneTransitionAnimation(activity, view.getMainImageView(), DefFilm.SHARED_ELEMENT)
-                    .toBundle();
-
-            activity.startActivity(intent, bundle);
+            activity.startActivity(intent);
         }
     }
 

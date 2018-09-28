@@ -1,4 +1,4 @@
-package sgtmelon.kudagofilmstv.annot;
+package sgtmelon.kudagofilmstv.office.annot;
 
 import android.support.annotation.IntDef;
 

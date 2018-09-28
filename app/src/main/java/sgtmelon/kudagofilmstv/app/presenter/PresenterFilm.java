@@ -1,4 +1,4 @@
-package sgtmelon.kudagofilmstv.presenter;
+package sgtmelon.kudagofilmstv.app.presenter;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -10,7 +10,7 @@ import android.support.v4.content.ContextCompat;
 import android.view.ViewGroup;
 import com.squareup.picasso.Picasso;
 import sgtmelon.kudagofilmstv.R;
-import sgtmelon.kudagofilmstv.model.ItemFilm;
+import sgtmelon.kudagofilmstv.app.model.ItemFilm;
 
 public class PresenterFilm extends Presenter {
 
@@ -76,8 +76,8 @@ public class PresenterFilm extends Presenter {
                 .centerCrop()
                 .into(cardView.getMainImageView());
 
-        cardView.setTitleText(itemFilm.getTitle() + " " + itemFilm.getAge());
-        cardView.setContentText(itemFilm.getYear() + ", " + itemFilm.getCountry() + ", " + itemFilm.getTime());
+        cardView.setTitleText(itemFilm.getTitle() + " " + itemFilm.getAgeRestriction());
+        cardView.setContentText(itemFilm.getYear() + ", " + itemFilm.getCountry() + ", " + itemFilm.getRunningTime());
     }
 
     @Override

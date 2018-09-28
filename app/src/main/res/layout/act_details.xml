@@ -4,13 +4,13 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.ActDetails">
+        tools:context=".app.ui.ActDetails">
 
     <fragment
             android:id="@+id/actDetails_frg"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:name="sgtmelon.kudagofilmstv.ui.FrgDetails"
+            android:name="sgtmelon.kudagofilmstv.app.ui.FrgDetails"
             tools:deviceIds="tv"/>
 
 </FrameLayout>

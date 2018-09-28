@@ -1,4 +1,4 @@
-package sgtmelon.kudagofilmstv.ui;
+package sgtmelon.kudagofilmstv.app.ui;
 
 import android.content.Context;
 import android.content.Intent;
@@ -18,16 +18,16 @@ import android.widget.Toast;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import sgtmelon.kudagofilmstv.R;
-import sgtmelon.kudagofilmstv.annot.DefAction;
-import sgtmelon.kudagofilmstv.annot.DefFilm;
-import sgtmelon.kudagofilmstv.model.ItemFilm;
-import sgtmelon.kudagofilmstv.presenter.PresenterDetails;
-import sgtmelon.kudagofilmstv.presenter.PresenterFilm;
+import sgtmelon.kudagofilmstv.app.model.ItemFilm;
+import sgtmelon.kudagofilmstv.app.presenter.PresenterDetails;
+import sgtmelon.kudagofilmstv.app.presenter.PresenterFilm;
+import sgtmelon.kudagofilmstv.office.annot.DefAction;
+import sgtmelon.kudagofilmstv.office.annot.DefTransition;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class FrgDetails extends DetailsSupportFragment implements OnItemViewClickedListener, BaseOnItemViewSelectedListener {
+public class FrgDetails extends DetailsSupportFragment implements OnItemViewClickedListener {
 
     private static final String TAG = FrgDetails.class.getSimpleName();
 
@@ -48,9 +48,9 @@ public class FrgDetails extends DetailsSupportFragment implements OnItemViewClic
             Bundle bundle = activity.getIntent().getExtras();
 
             selectedFilm = bundle != null
-                    ? selectedFilm = bundle.getParcelable(DefFilm.INTENT)
+                    ? selectedFilm = bundle.getParcelable(DefTransition.INTENT_FILM)
                     : savedInstanceState != null
-                    ? savedInstanceState.getParcelable(DefFilm.INTENT)
+                    ? savedInstanceState.getParcelable(DefTransition.INTENT_FILM)
                     : null;
         }
 
@@ -62,7 +62,6 @@ public class FrgDetails extends DetailsSupportFragment implements OnItemViewClic
         setupListRow();
 
         setOnItemViewClickedListener(this);
-        setOnItemViewSelectedListener(this);
     }
 
     @Override
@@ -115,12 +114,6 @@ public class FrgDetails extends DetailsSupportFragment implements OnItemViewClic
         detailsPresenter.setInitialState(FullWidthDetailsOverviewRowPresenter.STATE_HALF);
         detailsPresenter.setOnActionClickedListener(action -> Toast.makeText(context, action.toString(), Toast.LENGTH_SHORT).show());
 
-        FullWidthDetailsOverviewSharedElementHelper mHelper = new FullWidthDetailsOverviewSharedElementHelper();
-        mHelper.setSharedElementEnterTransition(getActivity(), DefFilm.SHARED_ELEMENT);
-        detailsPresenter.setListener(mHelper);
-        detailsPresenter.setParticipatingEntranceTransition(false);
-        prepareEntranceTransition();
-
         ClassPresenterSelector presenterSelector = new ClassPresenterSelector();
         presenterSelector.addClassPresenter(DetailsOverviewRow.class, detailsPresenter);
         presenterSelector.addClassPresenter(ListRow.class, new ListRowPresenter());
@@ -147,7 +140,6 @@ public class FrgDetails extends DetailsSupportFragment implements OnItemViewClic
                     @Override
                     public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
                         row.setImageBitmap(activity, bitmap);
-                        startEntranceTransition();
                     }
 
                     @Override
@@ -163,8 +155,8 @@ public class FrgDetails extends DetailsSupportFragment implements OnItemViewClic
 
         SparseArrayObjectAdapter adapterAction = new SparseArrayObjectAdapter();
 
-        adapterAction.set(DefAction.URL_TRAILER, new Action(DefAction.URL_TRAILER, getResources().getString(R.string.action_uri_trailer)));
-        adapterAction.set(DefAction.URL_KUDA_GO, new Action(DefAction.URL_KUDA_GO, getResources().getString(R.string.action_uri_kuda_go)));
+        adapterAction.set(DefAction.URL_TRAILER, new Action(DefAction.URL_TRAILER, getResources().getString(R.string.action_url_trailer)));
+        adapterAction.set(DefAction.URL_KUDA_GO, new Action(DefAction.URL_KUDA_GO, getResources().getString(R.string.action_url_kuda_go)));
 
         row.setActionsAdapter(adapterAction);
 
@@ -249,11 +241,11 @@ public class FrgDetails extends DetailsSupportFragment implements OnItemViewClic
             ItemFilm itemFilm = (ItemFilm) o;
 
             Intent intent = new Intent(activity, ActDetails.class);
-            intent.putExtra(DefFilm.INTENT, itemFilm);
+            intent.putExtra(DefTransition.INTENT_FILM, itemFilm);
 
             ImageCardView view = (ImageCardView) viewHolder.view;
             Bundle bundle = ActivityOptionsCompat
-                    .makeSceneTransitionAnimation(activity, view.getMainImageView(), DefFilm.SHARED_ELEMENT)
+                    .makeSceneTransitionAnimation(activity, view.getMainImageView(), DefTransition.SHARED_ELEMENT_FILM)
                     .toBundle();
 
             activity.startActivity(intent, bundle);
@@ -261,18 +253,11 @@ public class FrgDetails extends DetailsSupportFragment implements OnItemViewClic
     }
 
     @Override
-    public void onItemSelected(Presenter.ViewHolder viewHolder, Object o, RowPresenter.ViewHolder viewHolder1, Object o2) {
-        Log.i(TAG, "onItemSelected");
-
-
-    }
-
-    @Override
     public void onSaveInstanceState(Bundle outState) {
         Log.i(TAG, "onSaveInstanceState");
         super.onSaveInstanceState(outState);
 
-        outState.putParcelable(DefFilm.INTENT, selectedFilm);
+        outState.putParcelable(DefTransition.INTENT_FILM, selectedFilm);
     }
 
 }

@@ -20,7 +20,7 @@
             android:theme="@style/AppTheme">
 
         <activity
-                android:name=".ui.ActMain"
+                android:name=".app.ui.ActMain"
                 android:icon="@drawable/ic_app"
                 android:label="@string/title_act_main"
                 android:logo="@drawable/ic_app">
@@ -31,7 +31,7 @@
         </activity>
 
         <activity
-                android:name=".ui.ActDetails"
+                android:name=".app.ui.ActDetails"
                 android:icon="@drawable/ic_app"
                 android:label="@string/title_act_details"
                 android:logo="@drawable/ic_app">
