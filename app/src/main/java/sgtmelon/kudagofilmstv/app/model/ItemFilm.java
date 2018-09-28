@@ -4,90 +4,79 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import sgtmelon.kudagofilmstv.office.annot.DefServer;
+import sgtmelon.kudagofilmstv.office.annot.DefApi;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 
 public class ItemFilm implements Parcelable {
 
-    @SerializedName(DefServer.field_id)
+    @SerializedName(DefApi.field_id)
     @Expose
     private long id;
-    @SerializedName(DefServer.field_siteUrl)
+    @SerializedName(DefApi.field_siteUrl)
     @Expose
     private String siteUrl;
 
-    @SerializedName(DefServer.field_title)
+    @SerializedName(DefApi.field_title)
     @Expose
     private String title;
-    @SerializedName(DefServer.field_bodyText)
+    @SerializedName(DefApi.field_bodyText)
     @Expose
     private String bodyText;
 
-    @SerializedName(DefServer.field_country)
+    @SerializedName(DefApi.field_isEditorsChoice)
+    @Expose
+    private boolean editorsChoice;
+    @SerializedName(DefApi.field_genres)
+    @Expose
+    private ItemGenre[] genres;
+
+    @SerializedName(DefApi.field_country)
     @Expose
     private String country;
-    @SerializedName(DefServer.field_year)
+    @SerializedName(DefApi.field_year)
     @Expose
     private String year;
-    @SerializedName(DefServer.field_runningTime)
+    @SerializedName(DefApi.field_runningTime)
     @Expose
     private String runningTime;
-    @SerializedName(DefServer.field_ageRestriction)
+
+    @SerializedName(DefApi.field_budget_currency)
+    @Expose
+    private String budgetCurrency;
+    @SerializedName(DefApi.field_budget)
+    @Expose
+    private String budget;
+
+    @SerializedName(DefApi.field_ageRestriction)
     @Expose
     private String ageRestriction;
 
-    @SerializedName(DefServer.field_trailer)
+    @SerializedName(DefApi.field_stars)
+    @Expose
+    private String start;
+    @SerializedName(DefApi.field_director)
+    @Expose
+    private String director;
+    @SerializedName(DefApi.field_writer)
+    @Expose
+    private String writer;
+
+    @SerializedName(DefApi.field_trailer)
     @Expose
     private String trailer;
-    @SerializedName(DefServer.field_poster)
+    @SerializedName(DefApi.field_poster)
     @Expose
     private ItemImage poster;
-    @SerializedName(DefServer.field_images)
+    @SerializedName(DefApi.field_images)
     @Expose
     private ItemImage[] images;
-    private int ps = 0;
+    private int ps;
 
-    public ItemFilm() {
-        id = 3385;
-
-        title = "Остров собак";
-        bodyText = "<p>Мультипликационный фильм Уэса Андерсона («Королевство полной луны», «Гранд Отель Будапешт»). Для собак города Мегасаки настали не самые дружелюбные времена: согласно указу мэра-тирана, все они должны отправиться на свалку. Потерявший в этой политической борьбе своего пса Слотса мальчик Атари отправляется искать питомца и вскоре находит — в месте, где всё будет по-другому. Приз Берлинского кинофестиваля за лучшую режиссуру. </p>";
-
-        year = "2018";
-        country = "США, Германия";
-        runningTime = "101";
-        ageRestriction = "12+";
-
-        trailer = "https://www.youtube.com/watch?v=brbm6vKW7IA";
-        poster = new ItemImage("https://kudago.com/media/images/movie/poster/97/28/97282e7a39837b263497dfd317ec10ce.jpg");
-        images = new ItemImage[]{
-            new ItemImage("https://kudago.com/media/images/movie/15/1f/151ffc3b53200fac9bc8c7b9d5f9d272.jpg"),
-            new ItemImage("https://kudago.com/media/images/movie/8d/e2/8de265506b2a0f76c6fe225df80da2ca.jpg"),
-            new ItemImage("https://kudago.com/media/images/movie/cf/b6/cfb6a382c234b626c1ba4c950c5697d7.jpg")
-        } ;
-    }
-
-    private ItemFilm(Parcel in) {
-        id = in.readLong();
-        siteUrl = in.readString();
-
-        title = in.readString();
-        bodyText = in.readString();
-
-        country = in.readString();
-        year = in.readString();
-        runningTime = in.readString();
-        ageRestriction = in.readString();
-
-        poster = in.readParcelable(ItemImage.class.getClassLoader());
-        trailer = in.readString();
-
-        images = (ItemImage[]) in.readParcelableArray(ItemImage.class.getClassLoader());
-
-        ps = in.readInt();
-    }
+    @SerializedName(DefApi.field_imdbRating)
+    @Expose
+    private String rating;
 
     public static final Creator<ItemFilm> CREATOR = new Creator<ItemFilm>() {
         @Override
@@ -101,6 +90,87 @@ public class ItemFilm implements Parcelable {
         }
     };
 
+    private ItemFilm(Parcel in) {
+        id = in.readLong();
+        siteUrl = in.readString();
+
+        title = in.readString();
+        bodyText = in.readString();
+
+        editorsChoice = in.readByte() != 0;
+
+        Parcelable[] temp = in.readParcelableArray(ItemFilm.class.getClassLoader());
+        if (temp != null) {
+            genres = new ItemGenre[temp.length];
+            for (int i = 0; i < temp.length; i++) {
+                genres[i] = (ItemGenre) temp[i];
+            }
+        } else genres = null;
+
+        country = in.readString();
+        year = in.readString();
+        runningTime = in.readString();
+        budgetCurrency = in.readString();
+        budget = in.readString();
+        ageRestriction = in.readString();
+
+        start = in.readString();
+        director = in.readString();
+        writer = in.readString();
+
+        trailer = in.readString();
+
+        temp = in.readParcelableArray(ItemFilm.class.getClassLoader());
+        if (temp != null) {
+            images = new ItemImage[temp.length];
+            for (int i = 0; i < temp.length; i++) {
+                images[i] = (ItemImage) temp[i];
+            }
+        } else images = null;
+        ps = in.readInt();
+
+        poster = in.readParcelable(ItemFilm.class.getClassLoader());
+
+        rating = in.readString();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeLong(id);
+        parcel.writeString(siteUrl);
+
+        parcel.writeString(title);
+        parcel.writeString(bodyText);
+
+        parcel.writeByte((byte) (editorsChoice ? 1 : 0));
+        parcel.writeParcelableArray(genres, i);
+
+        parcel.writeString(country);
+        parcel.writeString(year);
+        parcel.writeString(runningTime);
+
+        parcel.writeString(budgetCurrency);
+        parcel.writeString(budget);
+        parcel.writeString(ageRestriction);
+
+        parcel.writeString(start);
+        parcel.writeString(director);
+        parcel.writeString(writer);
+
+        parcel.writeString(trailer);
+
+        parcel.writeParcelableArray(images, i);
+        parcel.writeInt(ps);
+
+        parcel.writeParcelable(poster, i);
+
+        parcel.writeString(rating);
+    }
 
     public long getId() {
         return id;
@@ -138,12 +208,20 @@ public class ItemFilm implements Parcelable {
         this.bodyText = bodyText;
     }
 
-    public String getYear() {
-        return year;
+    public boolean isEditorsChoice() {
+        return editorsChoice;
     }
 
-    public void setYear(String year) {
-        this.year = year;
+    public void setEditorsChoice(boolean editorsChoice) {
+        this.editorsChoice = editorsChoice;
+    }
+
+    public ItemGenre[] getGenres() {
+        return genres;
+    }
+
+    public void setGenres(ItemGenre[] genres) {
+        this.genres = genres;
     }
 
     public String getCountry() {
@@ -154,6 +232,14 @@ public class ItemFilm implements Parcelable {
         this.country = country;
     }
 
+    public String getYear() {
+        return year;
+    }
+
+    public void setYear(String year) {
+        this.year = year;
+    }
+
     public String getRunningTime() {
         return runningTime;
     }
@@ -162,12 +248,52 @@ public class ItemFilm implements Parcelable {
         this.runningTime = runningTime;
     }
 
+    public String getBudgetCurrency() {
+        return budgetCurrency;
+    }
+
+    public void setBudgetCurrency(String budgetCurrency) {
+        this.budgetCurrency = budgetCurrency;
+    }
+
+    public String getBudget() {
+        return budget;
+    }
+
+    public void setBudget(String budget) {
+        this.budget = budget;
+    }
+
     public String getAgeRestriction() {
         return ageRestriction;
     }
 
     public void setAgeRestriction(String ageRestriction) {
         this.ageRestriction = ageRestriction;
+    }
+
+    public String getStart() {
+        return start;
+    }
+
+    public void setStart(String start) {
+        this.start = start;
+    }
+
+    public String getDirector() {
+        return director;
+    }
+
+    public void setDirector(String director) {
+        this.director = director;
+    }
+
+    public String getWriter() {
+        return writer;
+    }
+
+    public void setWriter(String writer) {
+        this.writer = writer;
     }
 
     public URI getTrailer() {
@@ -183,11 +309,14 @@ public class ItemFilm implements Parcelable {
     }
 
     public URI getPoster() {
-        try {
-            return new URI(poster.getImage());
-        } catch (URISyntaxException e) {
-            return null;
+        if (poster != null) {
+            try {
+                return new URI(poster.getImage());
+            } catch (URISyntaxException e) {
+                return null;
+            }
         }
+        return null;
     }
 
     public void setPoster(ItemImage poster) {
@@ -195,14 +324,17 @@ public class ItemFilm implements Parcelable {
     }
 
     public URI getImages() {
-        ItemImage image = images[ps];
-        ps = ++ps % images.length;
+        if (images != null && images.length != 0) {
+            ItemImage image = images[ps];
+            ps = ++ps % images.length;
 
-        try {
-            return new URI(image.getImage());
-        } catch (URISyntaxException e) {
-            return null;
+            try {
+                return new URI(image.getImage());
+            } catch (URISyntaxException e) {
+                return null;
+            }
         }
+        return null;
     }
 
     public void setImages(ItemImage[] images) {
@@ -217,30 +349,12 @@ public class ItemFilm implements Parcelable {
         this.ps = ps;
     }
 
-
-    @Override
-    public int describeContents() {
-        return 0;
+    public String getRating() {
+        return rating;
     }
 
-    @Override
-    public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeLong(id);
-        parcel.writeString(siteUrl);
-
-        parcel.writeString(title);
-        parcel.writeString(bodyText);
-
-        parcel.writeString(country);
-        parcel.writeString(year);
-        parcel.writeString(runningTime);
-        parcel.writeString(ageRestriction);
-
-        parcel.writeString(trailer);
-        parcel.writeString(poster.getImage());
-
-        parcel.writeParcelableArray(images, 0);
-        parcel.writeInt(ps);
+    public void setRating(String rating) {
+        this.rating = rating;
     }
 
 }

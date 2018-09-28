@@ -2,6 +2,7 @@ package sgtmelon.kudagofilmstv.app.presenter;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.ColorInt;
 import android.support.v17.leanback.widget.BaseCardView;
 import android.support.v17.leanback.widget.ImageCardView;
@@ -11,6 +12,8 @@ import android.view.ViewGroup;
 import com.squareup.picasso.Picasso;
 import sgtmelon.kudagofilmstv.R;
 import sgtmelon.kudagofilmstv.app.model.ItemFilm;
+
+import java.net.URI;
 
 public class PresenterFilm extends Presenter {
 
@@ -23,6 +26,8 @@ public class PresenterFilm extends Presenter {
     @ColorInt
     private final int clBackgroundSelected;
 
+    private final Drawable icDefault;
+
     public PresenterFilm(Context context) {
         this.context = context;
 
@@ -32,6 +37,8 @@ public class PresenterFilm extends Presenter {
 
         clBackgroundDefault = ContextCompat.getColor(context, R.color.background_details_default);
         clBackgroundSelected = ContextCompat.getColor(context, R.color.background_details_selected);
+
+        icDefault = context.getDrawable(R.drawable.ic_default);
     }
 
     @Override
@@ -69,15 +76,21 @@ public class PresenterFilm extends Presenter {
 
         cardView.setMainImageDimensions(cardWidth, cardHeight);
 
-        Picasso.get()
-                .load(itemFilm.getPoster().toString())
-                .resize(cardWidth, cardHeight)
-                .placeholder(R.drawable.ic_default)
-                .centerCrop()
-                .into(cardView.getMainImageView());
+        URI uri = itemFilm.getPoster();
+        if (uri != null) {
+            Picasso.get()
+                    .load(uri.toString())
+                    .resize(cardWidth, cardHeight)
+                    .placeholder(icDefault)
+                    .error(icDefault)
+                    .centerCrop()
+                    .into(cardView.getMainImageView());
+        } else {
+            cardView.setMainImage(icDefault);
+        }
 
         cardView.setTitleText(itemFilm.getTitle() + " " + itemFilm.getAgeRestriction());
-        cardView.setContentText(itemFilm.getYear() + ", " + itemFilm.getCountry() + ", " + itemFilm.getRunningTime());
+        cardView.setContentText(itemFilm.getRating());
     }
 
     @Override

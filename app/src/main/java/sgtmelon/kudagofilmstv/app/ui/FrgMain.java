@@ -13,7 +13,6 @@ import android.support.v17.leanback.app.BrowseSupportFragment;
 import android.support.v17.leanback.widget.*;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.widget.Toast;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import retrofit2.Call;
@@ -21,12 +20,13 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import sgtmelon.kudagofilmstv.R;
 import sgtmelon.kudagofilmstv.app.model.ItemFilm;
+import sgtmelon.kudagofilmstv.app.model.RepoApi;
 import sgtmelon.kudagofilmstv.app.model.RepoFilm;
-import sgtmelon.kudagofilmstv.app.model.RepoServer;
 import sgtmelon.kudagofilmstv.app.presenter.PresenterFilm;
-import sgtmelon.kudagofilmstv.office.annot.DefServer;
-import sgtmelon.kudagofilmstv.office.annot.DefTransition;
+import sgtmelon.kudagofilmstv.office.annot.DefApi;
+import sgtmelon.kudagofilmstv.office.annot.DefIntent;
 
+import java.net.URI;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -37,6 +37,8 @@ public class FrgMain extends BrowseSupportFragment implements OnItemViewClickedL
 
     private Context context;
     private ActMain activity;
+
+    private RepoApi repoApi;
 
     @Override
     public void onAttach(Context context) {
@@ -57,12 +59,10 @@ public class FrgMain extends BrowseSupportFragment implements OnItemViewClickedL
         setupUI();
         setupRow();
 
-        RepoServer repoServer = new RepoServer();
-        repoServer.getApi()
-                .getListFilm(/*0, 100, DefServer.field_title, DefServer.text_format_text*/)
-                .enqueue(serverCallback);
-
-        Log.i(TAG, "onActivityCreated: " + DefServer.baseUrl + DefServer.extraUrl + "?" + DefServer.fields + "=" + DefServer.field);
+        repoApi = new RepoApi();
+        repoApi.getApi()
+                .getRating(page++, 100, DefApi.all_fields, DefApi.text_format_text, DefApi.field_imdbRating)
+                .enqueue(apiRatingCallback);
 
         setOnItemViewClickedListener(this);
         setOnItemViewSelectedListener(this);
@@ -125,61 +125,49 @@ public class FrgMain extends BrowseSupportFragment implements OnItemViewClickedL
     }
 
     private void setupRow() {
-        adapter = new ArrayObjectAdapter(new ListRowPresenter());
+        ArrayObjectAdapter adapter = new ArrayObjectAdapter(new ListRowPresenter());
 
-//        PresenterFilm presenterFilm = new PresenterFilm(context);
-//        ArrayObjectAdapter adpGridRow = new ArrayObjectAdapter(presenterFilm);
-//
-//        for (int i = 1; i < 4; i++) {
-//            HeaderItem headerItem = new HeaderItem(i, "Заголовок " + i);
-//            for (int j = 0; j < 5; j++) {
-//                ItemFilm itemFilm = new ItemFilm();
-//                adpGridRow.add(itemFilm);
-//            }
-//            adapter.add(new ListRow(headerItem, adpGridRow));
-//        }
+        PresenterFilm presenterFilm = new PresenterFilm(context);
+        adpGridRow = new ArrayObjectAdapter(presenterFilm);
+        HeaderItem headerItem = new HeaderItem(0, getString(R.string.header_act_main_top_rated));
+
+        adapter.add(new ListRow(headerItem, adpGridRow));
 
         setAdapter(adapter);
     }
 
-    ArrayObjectAdapter adapter;
+    ArrayObjectAdapter adpGridRow;
 
-    Callback<RepoFilm> serverCallback = new Callback<RepoFilm>() {
+    private int page = 1;
+
+    private final Callback<RepoFilm> apiRatingCallback = new Callback<RepoFilm>() {
         @Override
         public void onResponse(Call<RepoFilm> call, Response<RepoFilm> response) {
             Log.i(TAG, "onResponse");
 
-            PresenterFilm presenterFilm = new PresenterFilm(context);
-
-            for (int i = 0; i < 3; i++) {
-                ArrayObjectAdapter adpGridRow = new ArrayObjectAdapter(presenterFilm);
-                HeaderItem headerItem = new HeaderItem(i, "Заголовок " + i);
-                for (int j = 0; j < 5; j++) {
-                    ItemFilm itemFilm = new ItemFilm();
-                    adpGridRow.add(itemFilm);
-                }
-                adapter.add(new ListRow(headerItem, adpGridRow));
-            }
-
             if (response.body() != null) {
-                Log.i(TAG, "onResponse != null");
+                RepoFilm repoFilm = response.body();
 
-                ArrayObjectAdapter adpGridRow = new ArrayObjectAdapter(presenterFilm);
-                HeaderItem headerItem = new HeaderItem(3, "Все фильмы");
-
-                for (ItemFilm itemFilm : response.body().getListFilm()) {
-                    adpGridRow.add(itemFilm);
+                int start = adpGridRow.size();
+                for (ItemFilm itemFilm : repoFilm.getListFilmReverse()) {
+                   if (itemFilm.getRating() != null) {
+                       if (Double.parseDouble(itemFilm.getRating()) >= 7.5) {
+                           adpGridRow.add(itemFilm);
+                       }
+                   }
                 }
+                adpGridRow.notifyItemRangeChanged(start - 1, adpGridRow.size());
 
-                adapter.add(new ListRow(headerItem, adpGridRow));
+                if (repoFilm.getNext() != null) {
+                    repoApi.getApi()
+                            .getRating(page++, 100, DefApi.all_fields, DefApi.text_format_text, DefApi.field_imdbRating)
+                            .enqueue(apiRatingCallback);
+                }
             }
-
-            adapter.notifyArrayItemRangeChanged(0, adapter.size());
         }
 
         @Override
         public void onFailure(Call<RepoFilm> call, Throwable t) {
-            Toast.makeText(context, getString(R.string.error_internet), Toast.LENGTH_LONG).show();
         }
 
     };
@@ -216,28 +204,31 @@ public class FrgMain extends BrowseSupportFragment implements OnItemViewClickedL
     private void updateBackground(ItemFilm itemFilm) {
         Log.i(TAG, "updateBackground: ps=" + itemFilm.getPs());
 
-        Picasso.get()
-                .load(itemFilm.getImages().toString())
-                .resize(windowWidth, windowHeight)
-                .centerCrop()
-                .error(R.drawable.bg_default)
-                .placeholder(R.drawable.bg_default)
-                .into(new Target() {
-                    @Override
-                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                        backgroundManager.setBitmap(bitmap);
-                    }
+        URI uri = itemFilm.getImages();
+        if (uri != null) {
+            Picasso.get()
+                    .load(uri.toString())
+                    .resize(windowWidth, windowHeight)
+                    .centerCrop()
+                    .error(R.drawable.bg_default)
+                    .placeholder(R.drawable.bg_default)
+                    .into(new Target() {
+                        @Override
+                        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                            backgroundManager.setBitmap(bitmap);
+                        }
 
-                    @Override
-                    public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+                        @Override
+                        public void onBitmapFailed(Exception e, Drawable errorDrawable) {
 
-                    }
+                        }
 
-                    @Override
-                    public void onPrepareLoad(Drawable placeHolderDrawable) {
+                        @Override
+                        public void onPrepareLoad(Drawable placeHolderDrawable) {
 
-                    }
-                });
+                        }
+                    });
+        }
 
         startBackgroundTimer(getResources().getInteger(R.integer.duration_background_update));
     }
@@ -250,7 +241,7 @@ public class FrgMain extends BrowseSupportFragment implements OnItemViewClickedL
             ItemFilm itemFilm = (ItemFilm) o;
 
             Intent intent = new Intent(activity, ActDetails.class);
-            intent.putExtra(DefTransition.INTENT_FILM, itemFilm);
+            intent.putExtra(DefIntent.INTENT_FILM, itemFilm);
 
             activity.startActivity(intent);
         }

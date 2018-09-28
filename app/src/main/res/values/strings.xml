@@ -5,6 +5,11 @@
     <string name="title_act_main">Фильмы</string>
     <string name="title_act_details">Подробнее</string>
 
+    <string name="header_act_main_now">Сейчас в прокате</string>
+    <string name="header_act_main_top_rated">С наивысшим рейтингом</string>
+    <string name="header_act_main_editors_choice">Выбор редакции</string>
+
+
     <string name="header_act_details">Похожие фильмы</string>
 
     <string name="action_url_trailer">Трейлер</string>

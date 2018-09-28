@@ -4,11 +4,11 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import sgtmelon.kudagofilmstv.office.annot.DefServer;
+import sgtmelon.kudagofilmstv.office.annot.DefApi;
 
 public class ItemImage implements Parcelable {
 
-    @SerializedName(DefServer.image)
+    @SerializedName(DefApi.image)
     @Expose
     private String image;
 

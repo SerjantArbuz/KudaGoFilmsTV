@@ -2,17 +2,19 @@ package sgtmelon.kudagofilmstv.office.intf;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
+import retrofit2.http.Query;
 import sgtmelon.kudagofilmstv.app.model.RepoFilm;
-import sgtmelon.kudagofilmstv.office.annot.DefServer;
+import sgtmelon.kudagofilmstv.office.annot.DefApi;
 
 public interface IntfServer {
 
-    @GET(DefServer.extraUrl)
-    Call<RepoFilm> getListFilm(
-//            @Query(DefServer.page) int page,
-//                               @Query(DefServer.page_size) int pageSize,
-//                               @Query(DefServer.fields) String fields,
-//                               @Query(DefServer.text_format) String textFormat
+    @GET(DefApi.extraUrl)
+    Call<RepoFilm> getRating(
+            @Query(DefApi.page) int page,
+            @Query(DefApi.pageSize) int pageSize,
+            @Query(DefApi.fields) String fields,
+            @Query(DefApi.textFormat) String textFormat,
+            @Query(DefApi.orderBy) String orderBy
     );
 
 }

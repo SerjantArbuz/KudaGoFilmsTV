@@ -10,7 +10,6 @@ import android.os.Handler;
 import android.support.v17.leanback.app.BackgroundManager;
 import android.support.v17.leanback.app.DetailsSupportFragment;
 import android.support.v17.leanback.widget.*;
-import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -21,9 +20,11 @@ import sgtmelon.kudagofilmstv.R;
 import sgtmelon.kudagofilmstv.app.model.ItemFilm;
 import sgtmelon.kudagofilmstv.app.presenter.PresenterDetails;
 import sgtmelon.kudagofilmstv.app.presenter.PresenterFilm;
+import sgtmelon.kudagofilmstv.app.presenter.PresenterLogo;
 import sgtmelon.kudagofilmstv.office.annot.DefAction;
-import sgtmelon.kudagofilmstv.office.annot.DefTransition;
+import sgtmelon.kudagofilmstv.office.annot.DefIntent;
 
+import java.net.URI;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -48,9 +49,9 @@ public class FrgDetails extends DetailsSupportFragment implements OnItemViewClic
             Bundle bundle = activity.getIntent().getExtras();
 
             selectedFilm = bundle != null
-                    ? selectedFilm = bundle.getParcelable(DefTransition.INTENT_FILM)
+                    ? selectedFilm = bundle.getParcelable(DefIntent.INTENT_FILM)
                     : savedInstanceState != null
-                    ? savedInstanceState.getParcelable(DefTransition.INTENT_FILM)
+                    ? savedInstanceState.getParcelable(DefIntent.INTENT_FILM)
                     : null;
         }
 
@@ -108,7 +109,7 @@ public class FrgDetails extends DetailsSupportFragment implements OnItemViewClic
     private void setupAdapter() {
         Log.i(TAG, "setupAdapter");
 
-        FullWidthDetailsOverviewRowPresenter detailsPresenter = new FullWidthDetailsOverviewRowPresenter(new PresenterDetails());
+        FullWidthDetailsOverviewRowPresenter detailsPresenter = new FullWidthDetailsOverviewRowPresenter(new PresenterDetails(), new PresenterLogo(context));
 
         detailsPresenter.setBackgroundColor(ContextCompat.getColor(activity, R.color.background_fastlane));
         detailsPresenter.setInitialState(FullWidthDetailsOverviewRowPresenter.STATE_HALF);
@@ -131,27 +132,37 @@ public class FrgDetails extends DetailsSupportFragment implements OnItemViewClic
         int logoWidth = res.getDimensionPixelSize(R.dimen.detail_thumb_width);
         int logoHeight = res.getDimensionPixelSize(R.dimen.detail_thumb_height);
 
-        Picasso.get()
-                .load(selectedFilm.getPoster().toString())
-                .resize(logoWidth, logoHeight)
-                .centerCrop()
-                .placeholder(R.drawable.ic_default)
-                .into(new Target() {
-                    @Override
-                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                        row.setImageBitmap(activity, bitmap);
-                    }
+        URI uri = selectedFilm.getPoster();
+        if (uri != null) {
+            Picasso.get()
+                    .load(uri.toString())
+                    .resize(logoWidth, logoHeight)
+                    .centerCrop()
+                    .placeholder(R.drawable.ic_default)
+                    .into(new Target() {
+                        @Override
+                        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                            Log.i(TAG, "onBitmapLoaded");
+                            row.setImageBitmap(activity, bitmap);
+                        }
 
-                    @Override
-                    public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+                        @Override
+                        public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+                            Log.i(TAG, "onBitmapFailed");
 
-                    }
+                            row.setImageDrawable(errorDrawable);
+                        }
 
-                    @Override
-                    public void onPrepareLoad(Drawable placeHolderDrawable) {
+                        @Override
+                        public void onPrepareLoad(Drawable placeHolderDrawable) {
+                            Log.i(TAG, "onPrepareLoad");
 
-                    }
-                });
+                            row.setImageDrawable(placeHolderDrawable);
+                        }
+                    });
+        } else {
+            row.setImageDrawable(getResources().getDrawable(R.drawable.ic_default));
+        }
 
         SparseArrayObjectAdapter adapterAction = new SparseArrayObjectAdapter();
 
@@ -167,10 +178,10 @@ public class FrgDetails extends DetailsSupportFragment implements OnItemViewClic
         Log.i(TAG, "setupListRow");
 
         ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(new PresenterFilm(context));
-        for (int i = 0; i < 10; i++) {
-            ItemFilm itemFilm = new ItemFilm();
-            listRowAdapter.add(itemFilm);
-        }
+//        for (int i = 0; i < 10; i++) {
+//            ItemFilm itemFilm = new ItemFilm();
+//            listRowAdapter.add(itemFilm);
+//        }
         HeaderItem headerItem = new HeaderItem(0, getString(R.string.header_act_details));
 
         adapter.add(new ListRow(headerItem, listRowAdapter));
@@ -207,28 +218,31 @@ public class FrgDetails extends DetailsSupportFragment implements OnItemViewClic
     private void updateBackground(ItemFilm itemFilm) {
         Log.i(TAG, "updateBackground: ps=" + itemFilm.getPs());
 
-        Picasso.get()
-                .load(itemFilm.getImages().toString())
-                .resize(windowWidth, windowHeight)
-                .centerCrop()
-                .error(R.drawable.bg_default)
-                .placeholder(R.drawable.bg_default)
-                .into(new Target() {
-                    @Override
-                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                        backgroundManager.setBitmap(bitmap);
-                    }
+        URI uri = itemFilm.getImages();
+        if (uri != null) {
+            Picasso.get()
+                    .load(uri.toString())
+                    .resize(windowWidth, windowHeight)
+                    .centerCrop()
+                    .error(R.drawable.bg_default)
+                    .placeholder(R.drawable.bg_default)
+                    .into(new Target() {
+                        @Override
+                        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                            backgroundManager.setBitmap(bitmap);
+                        }
 
-                    @Override
-                    public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+                        @Override
+                        public void onBitmapFailed(Exception e, Drawable errorDrawable) {
 
-                    }
+                        }
 
-                    @Override
-                    public void onPrepareLoad(Drawable placeHolderDrawable) {
+                        @Override
+                        public void onPrepareLoad(Drawable placeHolderDrawable) {
 
-                    }
-                });
+                        }
+                    });
+        }
 
         startBackgroundTimer();
     }
@@ -241,14 +255,9 @@ public class FrgDetails extends DetailsSupportFragment implements OnItemViewClic
             ItemFilm itemFilm = (ItemFilm) o;
 
             Intent intent = new Intent(activity, ActDetails.class);
-            intent.putExtra(DefTransition.INTENT_FILM, itemFilm);
+            intent.putExtra(DefIntent.INTENT_FILM, itemFilm);
 
-            ImageCardView view = (ImageCardView) viewHolder.view;
-            Bundle bundle = ActivityOptionsCompat
-                    .makeSceneTransitionAnimation(activity, view.getMainImageView(), DefTransition.SHARED_ELEMENT_FILM)
-                    .toBundle();
-
-            activity.startActivity(intent, bundle);
+            activity.startActivity(intent);
         }
     }
 
@@ -257,7 +266,7 @@ public class FrgDetails extends DetailsSupportFragment implements OnItemViewClic
         Log.i(TAG, "onSaveInstanceState");
         super.onSaveInstanceState(outState);
 
-        outState.putParcelable(DefTransition.INTENT_FILM, selectedFilm);
+        outState.putParcelable(DefIntent.INTENT_FILM, selectedFilm);
     }
 
 }
