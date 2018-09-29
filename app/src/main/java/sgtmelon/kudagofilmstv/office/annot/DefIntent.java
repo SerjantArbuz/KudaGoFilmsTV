@@ -2,15 +2,16 @@ package sgtmelon.kudagofilmstv.office.annot;
 
 import android.support.annotation.StringDef;
 
+/**
+ * Аннотация для передачи данных между классами
+ */
 @StringDef({
-        DefIntent.INTENT_FILM,
-        DefIntent.INTENT_POSTER,
-        DefIntent.INTENT_IMAGES
+        DefIntent.FILM,
+        DefIntent.PAGE
 })
 public @interface DefIntent {
 
-    String INTENT_FILM = "INTENT_FILM";
-    String INTENT_POSTER = "INTENT_POSTER";
-    String INTENT_IMAGES = "INTENT_IMAGES";
+    String FILM = "INTENT_FILM";
+    String PAGE = "INTENT_PAGE";
 
 }

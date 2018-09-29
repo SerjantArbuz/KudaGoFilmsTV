@@ -1,4 +1,4 @@
-package sgtmelon.kudagofilmstv.app.model;
+package sgtmelon.kudagofilmstv.app.model.item;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -9,72 +9,65 @@ import sgtmelon.kudagofilmstv.office.annot.DefApi;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+/**
+ * Модель фильма
+ */
 public class ItemFilm implements Parcelable {
 
-    @SerializedName(DefApi.field_id)
+    @SerializedName(DefApi.field_f_id)
     @Expose
     private long id;
-    @SerializedName(DefApi.field_siteUrl)
+    @SerializedName(DefApi.field_f_siteUrl)
     @Expose
     private String siteUrl;
 
-    @SerializedName(DefApi.field_title)
+    @SerializedName(DefApi.field_f_title)
     @Expose
     private String title;
-    @SerializedName(DefApi.field_bodyText)
+    @SerializedName(DefApi.field_f_bodyText)
     @Expose
     private String bodyText;
 
-    @SerializedName(DefApi.field_isEditorsChoice)
-    @Expose
-    private boolean editorsChoice;
-    @SerializedName(DefApi.field_genres)
+    @SerializedName(DefApi.field_f_genres)
     @Expose
     private ItemGenre[] genres;
 
-    @SerializedName(DefApi.field_country)
+    @SerializedName(DefApi.field_f_country)
     @Expose
     private String country;
-    @SerializedName(DefApi.field_year)
+    @SerializedName(DefApi.field_f_year)
     @Expose
     private String year;
-    @SerializedName(DefApi.field_runningTime)
+    @SerializedName(DefApi.field_f_runningTime)
     @Expose
     private String runningTime;
 
-    @SerializedName(DefApi.field_budget_currency)
-    @Expose
-    private String budgetCurrency;
-    @SerializedName(DefApi.field_budget)
-    @Expose
-    private String budget;
-
-    @SerializedName(DefApi.field_ageRestriction)
+    @SerializedName(DefApi.field_f_ageRestriction)
     @Expose
     private String ageRestriction;
 
-    @SerializedName(DefApi.field_stars)
+    @SerializedName(DefApi.field_f_stars)
     @Expose
-    private String start;
-    @SerializedName(DefApi.field_director)
+    private String stars;
+    @SerializedName(DefApi.field_f_director)
     @Expose
     private String director;
-    @SerializedName(DefApi.field_writer)
+    @SerializedName(DefApi.field_f_writer)
     @Expose
     private String writer;
 
-    @SerializedName(DefApi.field_trailer)
+    @SerializedName(DefApi.field_f_trailer)
     @Expose
     private String trailer;
-    @SerializedName(DefApi.field_poster)
+    @SerializedName(DefApi.field_f_poster)
     @Expose
     private ItemImage poster;
-    @SerializedName(DefApi.field_images)
+    @SerializedName(DefApi.field_f_images)
     @Expose
     private ItemImage[] images;
     private int ps;
 
-    @SerializedName(DefApi.field_imdbRating)
+    @SerializedName(DefApi.field_f_imdbRating)
     @Expose
     private String rating;
 
@@ -97,8 +90,6 @@ public class ItemFilm implements Parcelable {
         title = in.readString();
         bodyText = in.readString();
 
-        editorsChoice = in.readByte() != 0;
-
         Parcelable[] temp = in.readParcelableArray(ItemFilm.class.getClassLoader());
         if (temp != null) {
             genres = new ItemGenre[temp.length];
@@ -110,11 +101,9 @@ public class ItemFilm implements Parcelable {
         country = in.readString();
         year = in.readString();
         runningTime = in.readString();
-        budgetCurrency = in.readString();
-        budget = in.readString();
         ageRestriction = in.readString();
 
-        start = in.readString();
+        stars = in.readString();
         director = in.readString();
         writer = in.readString();
 
@@ -147,18 +136,14 @@ public class ItemFilm implements Parcelable {
         parcel.writeString(title);
         parcel.writeString(bodyText);
 
-        parcel.writeByte((byte) (editorsChoice ? 1 : 0));
         parcel.writeParcelableArray(genres, i);
 
         parcel.writeString(country);
         parcel.writeString(year);
         parcel.writeString(runningTime);
-
-        parcel.writeString(budgetCurrency);
-        parcel.writeString(budget);
         parcel.writeString(ageRestriction);
 
-        parcel.writeString(start);
+        parcel.writeString(stars);
         parcel.writeString(director);
         parcel.writeString(writer);
 
@@ -208,16 +193,17 @@ public class ItemFilm implements Parcelable {
         this.bodyText = bodyText;
     }
 
-    public boolean isEditorsChoice() {
-        return editorsChoice;
-    }
-
-    public void setEditorsChoice(boolean editorsChoice) {
-        this.editorsChoice = editorsChoice;
-    }
-
-    public ItemGenre[] getGenres() {
-        return genres;
+    public String getGenres() {
+        StringBuilder gen = null;
+        if (genres != null && genres.length != 0) {
+            gen = new StringBuilder();
+            for (ItemGenre itemGenre : genres) {
+                gen.append(itemGenre.getName());
+                gen.append(", ");
+            }
+            gen.delete(gen.length() - 2, gen.length());
+        }
+        return gen != null ? gen.toString() : null;
     }
 
     public void setGenres(ItemGenre[] genres) {
@@ -248,23 +234,10 @@ public class ItemFilm implements Parcelable {
         this.runningTime = runningTime;
     }
 
-    public String getBudgetCurrency() {
-        return budgetCurrency;
-    }
-
-    public void setBudgetCurrency(String budgetCurrency) {
-        this.budgetCurrency = budgetCurrency;
-    }
-
-    public String getBudget() {
-        return budget;
-    }
-
-    public void setBudget(String budget) {
-        this.budget = budget;
-    }
-
     public String getAgeRestriction() {
+        if (ageRestriction != null && ageRestriction.equals("0")) {
+            return null;
+        }
         return ageRestriction;
     }
 
@@ -272,12 +245,12 @@ public class ItemFilm implements Parcelable {
         this.ageRestriction = ageRestriction;
     }
 
-    public String getStart() {
-        return start;
+    public String getStars() {
+        return stars;
     }
 
-    public void setStart(String start) {
-        this.start = start;
+    public void setStars(String stars) {
+        this.stars = stars;
     }
 
     public String getDirector() {
@@ -350,6 +323,9 @@ public class ItemFilm implements Parcelable {
     }
 
     public String getRating() {
+        if (rating != null && rating.equals("0.0")) {
+            return null;
+        }
         return rating;
     }
 

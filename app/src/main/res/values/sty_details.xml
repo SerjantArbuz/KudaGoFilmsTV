@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Container">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:orientation">vertical</item>
+    </style>
+
+    <style name="Container.Main">
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:padding">@dimen/layout_16dp</item>
+    </style>
+
+    <style name="Container.Content">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:layout_marginTop">@dimen/layout_4dp</item>
+    </style>
+
+    <style name="Text">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="Text.Title">
+        <item name="android:textSize">@dimen/text_24sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="Text.Subtitle">
+        <item name="android:textSize">@dimen/text_14sp</item>
+    </style>
+
+    <style name="Text.Content">
+        <item name="android:textSize">@dimen/text_16sp</item>
+        <item name="android:layout_marginTop">@dimen/layout_4dp</item>
+    </style>
+
+</resources>

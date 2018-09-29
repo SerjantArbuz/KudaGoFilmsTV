@@ -1,0 +1,13 @@
+<resources>
+
+    <string name="app_name">KudaGo Films</string>
+
+    <string name="title_act_main">Фильмы</string>
+    <string name="title_act_details">Подробнее</string>
+
+    <string name="action_url_trailer">Трейлер</string>
+    <string name="action_url_favorite">Избранное</string>
+
+    <string name="error_internet">Ошибка при подключении к серверу</string>
+
+</resources>

@@ -2,100 +2,94 @@ package sgtmelon.kudagofilmstv.office.annot;
 
 import android.support.annotation.StringDef;
 
+/**
+ * Аннотация для описания общения с Api
+ */
 @StringDef({
-        DefApi.page, DefApi.pageSize,
-        DefApi.fields, DefApi.textFormat,
-        DefApi.orderBy, DefApi.actualSince, DefApi.actualUntil,
+        DefApi.par_page, DefApi.par_pageSize,
+        DefApi.par_fields, DefApi.par_textFormat,
 
-        DefApi.field_id,
-        DefApi.field_siteUrl,
-        DefApi.field_title,
-        DefApi.field_bodyText,
-        DefApi.field_isEditorsChoice,
-        DefApi.field_genres,
-        DefApi.field_country,
-        DefApi.field_year,
-        DefApi.field_budget_currency,
-        DefApi.field_budget,
-        DefApi.field_runningTime,
-        DefApi.field_ageRestriction,
-        DefApi.field_stars,
-        DefApi.field_director,
-        DefApi.field_writer,
-        DefApi.field_trailer,
-        DefApi.field_images,
-        DefApi.field_poster,
-        DefApi.field_imdbRating,
+        DefApi.field_f_id,
+        DefApi.field_f_siteUrl,
+        DefApi.field_f_title,
+        DefApi.field_f_bodyText,
+        DefApi.field_f_genres,
+        DefApi.field_f_country,
+        DefApi.field_f_year,
+        DefApi.field_f_runningTime,
+        DefApi.field_f_ageRestriction,
+        DefApi.field_f_stars,
+        DefApi.field_f_director,
+        DefApi.field_f_writer,
+        DefApi.field_f_trailer,
+        DefApi.field_f_images,
+        DefApi.field_f_poster,
+        DefApi.field_f_imdbRating,
 
-        DefApi.count,
-        DefApi.next,
-        DefApi.results,
-        DefApi.image,
-        DefApi.name
+        DefApi.field_count,
+        DefApi.field_next,
+        DefApi.field_results,
+        DefApi.field_image,
+        DefApi.field_name
 
 })
 public @interface DefApi {
 
-    String baseUrl = "https://kudago.com/public-api/";
-    String extraUrl = "v1.4/movies/";
+    //Адресс Api
+    String urlBase = "https://kudago.com/public-api/";
+    String urlExtra = "v1.4/movies/";
 
-    String page = "page",
-            pageSize = "page_size",
-            fields = "fields",
-            textFormat = "text_format",
-            orderBy = "order_by",
-            actualSince = "actual_since",
-            actualUntil = "actual_until";
+    //Параметры
+    String par_page = "page",
+            par_pageSize = "page_size",
+            par_fields = "fields",
+            par_textFormat = "text_format";
 
-    String text_format_text = "text";
+    //Значения
+    String val_textFormat_text = "text";
 
-    String field_id = "id",
-            field_siteUrl = "site_url",
-            field_title = "title",
-            field_bodyText = "body_text",
-            field_isEditorsChoice = "is_editors_choice",
-            field_genres = "genres",
-            field_country = "country",
-            field_year = "year",
-            field_budget_currency = "budget_currency",
-            field_budget = "budget",
-            field_runningTime = "running_time",
-            field_ageRestriction = "age_restriction",
-            field_stars = "start",
-            field_director = "director",
-            field_writer = "writer",
-            field_trailer = "trailer",
-            field_images = "images",
-            field_poster = "poster",
-            field_imdbRating = "imdb_rating";
+    //Поля фильмов
+    String field_f_id = "id",
+            field_f_siteUrl = "site_url",
+            field_f_title = "title",
+            field_f_bodyText = "body_text",
+            field_f_genres = "genres",
+            field_f_country = "country",
+            field_f_year = "year",
+            field_f_runningTime = "running_time",
+            field_f_ageRestriction = "age_restriction",
+            field_f_stars = "start",
+            field_f_director = "director",
+            field_f_writer = "writer",
+            field_f_trailer = "trailer",
+            field_f_images = "images",
+            field_f_poster = "poster",
+            field_f_imdbRating = "imdb_rating";
 
-    String div = ",";
+    String div_field_f = ",";
 
-    String all_fields = field_id + div +
-            field_siteUrl + div +
-            field_title + div +
-            field_bodyText + div +
-            field_isEditorsChoice + div +
-            field_genres + div +
-            field_country + div +
-            field_year + div +
-            field_budget_currency + div +
-            field_budget + div +
-            field_runningTime + div +
-            field_ageRestriction + div +
-            field_stars + div +
-            field_director + div +
-            field_writer + div +
-            field_trailer + div +
-            field_images + div +
-            field_poster + div +
-            field_imdbRating;
+    String allFilmFields = field_f_id + div_field_f +
+            field_f_siteUrl + div_field_f +
+            field_f_title + div_field_f +
+            field_f_bodyText + div_field_f +
+            field_f_genres + div_field_f +
+            field_f_country + div_field_f +
+            field_f_year + div_field_f +
+            field_f_runningTime + div_field_f +
+            field_f_ageRestriction + div_field_f +
+            field_f_stars + div_field_f +
+            field_f_director + div_field_f +
+            field_f_writer + div_field_f +
+            field_f_trailer + div_field_f +
+            field_f_images + div_field_f +
+            field_f_poster + div_field_f +
+            field_f_imdbRating;
 
-    String count = "count",
-            next = "next",
-            previous = "previous",
-            results = "results",
-            image = "image",
-            name = "name";
+    //Остальные поля
+    String field_count = "count",
+            field_next = "next",
+            field_results = "results",
+            field_image = "image",
+            field_name = "name";
 
 }

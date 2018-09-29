@@ -2,6 +2,7 @@ package sgtmelon.kudagofilmstv.app.presenter;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
 import android.support.v17.leanback.widget.DetailsOverviewLogoPresenter;
 import android.support.v17.leanback.widget.DetailsOverviewRow;
 import android.support.v17.leanback.widget.FullWidthDetailsOverviewRowPresenter;
@@ -10,30 +11,27 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import com.squareup.picasso.Picasso;
 import sgtmelon.kudagofilmstv.R;
+import sgtmelon.kudagofilmstv.app.model.item.ItemFilm;
 
+import java.net.URI;
+
+/**
+ * Презентер логотипа фильма
+ */
 public class PresenterLogo extends DetailsOverviewLogoPresenter {
 
+    private final Drawable logoDefault;
     private final int logoWidth, logoHeight;
 
     public PresenterLogo(Context context) {
         Resources res = context.getResources();
+
+        logoDefault = res.getDrawable(R.drawable.ic_default, null);
+
         logoWidth = res.getDimensionPixelSize(R.dimen.detail_thumb_width);
         logoHeight = res.getDimensionPixelSize(R.dimen.detail_thumb_height);
-    }
-
-    static class ViewHolder extends DetailsOverviewLogoPresenter.ViewHolder {
-        ViewHolder(View view) {
-            super(view);
-        }
-
-        public FullWidthDetailsOverviewRowPresenter getParentPresenter() {
-            return mParentPresenter;
-        }
-
-        public FullWidthDetailsOverviewRowPresenter.ViewHolder getParentViewHolder() {
-            return mParentViewHolder;
-        }
     }
 
     @Override
@@ -48,15 +46,47 @@ public class PresenterLogo extends DetailsOverviewLogoPresenter {
 
     @Override
     public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object item) {
-        DetailsOverviewRow row = (DetailsOverviewRow) item;
-
         ImageView imageView = ((ImageView) viewHolder.view);
-        imageView.setImageDrawable(row.getImageDrawable());
 
-        if (isBoundToImage((ViewHolder) viewHolder, row)) {
-            PresenterLogo.ViewHolder vh = (PresenterLogo.ViewHolder) viewHolder;
-            vh.getParentPresenter().notifyOnBindLogo(vh.getParentViewHolder());
+        if (item instanceof DetailsOverviewRow) {
+            DetailsOverviewRow row = (DetailsOverviewRow) item;
+            if (row.getItem() instanceof ItemFilm) {
+                ItemFilm itemFilm = (ItemFilm) row.getItem();
+
+                URI uri = itemFilm.getPoster();
+                if (uri != null) {
+                    Picasso.get()
+                            .load(uri.toString())
+                            .resize(logoWidth, logoHeight)
+                            .centerCrop()
+                            .placeholder(logoDefault)
+                            .error(logoDefault)
+                            .into(imageView);
+                } else {
+                    imageView.setImageDrawable(logoDefault);
+                }
+
+                if (isBoundToImage((ViewHolder) viewHolder, row)) {
+                    PresenterLogo.ViewHolder vh = (PresenterLogo.ViewHolder) viewHolder;
+                    vh.getParentPresenter().notifyOnBindLogo(vh.getParentViewHolder());
+                }
+            }
         }
+    }
+
+    static class ViewHolder extends DetailsOverviewLogoPresenter.ViewHolder {
+        ViewHolder(View view) {
+            super(view);
+        }
+
+        public FullWidthDetailsOverviewRowPresenter getParentPresenter() {
+            return mParentPresenter;
+        }
+
+        public FullWidthDetailsOverviewRowPresenter.ViewHolder getParentViewHolder() {
+            return mParentViewHolder;
+        }
+
     }
 
 }

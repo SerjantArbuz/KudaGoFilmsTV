@@ -11,15 +11,18 @@ import android.support.v4.content.ContextCompat;
 import android.view.ViewGroup;
 import com.squareup.picasso.Picasso;
 import sgtmelon.kudagofilmstv.R;
-import sgtmelon.kudagofilmstv.app.model.ItemFilm;
+import sgtmelon.kudagofilmstv.app.model.item.ItemFilm;
 
 import java.net.URI;
 
+/**
+ * Презентер для карточки фильма
+ */
 public class PresenterFilm extends Presenter {
 
     private final Context context;
 
-    private final int cardWidth, cardHeight; // TODO: 28.09.2018
+    private final int cardWidth, cardHeight;
 
     @ColorInt
     private final int clBackgroundDefault;
@@ -89,8 +92,8 @@ public class PresenterFilm extends Presenter {
             cardView.setMainImage(icDefault);
         }
 
-        cardView.setTitleText(itemFilm.getTitle() + " " + itemFilm.getAgeRestriction());
-        cardView.setContentText(itemFilm.getRating());
+        cardView.setTitleText(itemFilm.getTitle());
+        cardView.setContentText(itemFilm.getRating() == null ? "Без рейтинга" : "Рейтинг: " + itemFilm.getRating());
     }
 
     @Override

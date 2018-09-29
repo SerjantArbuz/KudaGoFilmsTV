@@ -6,6 +6,9 @@ import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import sgtmelon.kudagofilmstv.R;
 
+/**
+ * Активити детальной информации
+ */
 public class ActDetails extends FragmentActivity {
 
     private static final String TAG = ActDetails.class.getSimpleName();

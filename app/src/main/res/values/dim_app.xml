@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="card_width">150dp</dimen>
+    <dimen name="card_height">180dp</dimen>
+
+    <dimen name="detail_thumb_width">210dp</dimen>
+    <dimen name="detail_thumb_height">310dp</dimen>
+
+    <dimen name="text_24sp">24sp</dimen>
+    <dimen name="text_18sp">18sp</dimen>
+    <dimen name="text_16sp">16sp</dimen>
+    <dimen name="text_14sp">14sp</dimen>
+
+    <dimen name="layout_24dp">24dp</dimen>
+    <dimen name="layout_16dp">16dp</dimen>
+    <dimen name="layout_8dp">8dp</dimen>
+    <dimen name="layout_4dp">4dp</dimen>
+    <dimen name="layout_2dp">2dp</dimen>
+    <dimen name="layout_1dp">1dp</dimen>
+    <dimen name="layout_0dp">0dp</dimen>
+
+</resources>

@@ -7,11 +7,11 @@
     <color name="background_default_start">#272727</color>
     <color name="background_default_end">#757575</color>
 
-    <color name="background_fastlane">#80272727</color>
+    <color name="background_fastlane">#272727</color>
+    <color name="background_details">#a0272727</color>
+    <color name="background_action">#c0272727</color>
 
     <color name="background_details_default">#272727</color>
     <color name="background_details_selected">#fd4c2a</color>
-
-    <color name="text">#fafafa</color>
 
 </resources>

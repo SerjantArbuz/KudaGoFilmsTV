@@ -1,4 +1,4 @@
-package sgtmelon.kudagofilmstv.app.model;
+package sgtmelon.kudagofilmstv.app.provider;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -6,14 +6,16 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import sgtmelon.kudagofilmstv.BuildConfig;
 import sgtmelon.kudagofilmstv.office.annot.DefApi;
-import sgtmelon.kudagofilmstv.office.intf.IntfServer;
+import sgtmelon.kudagofilmstv.office.intf.IntfApi;
 
-public class RepoApi {
+/**
+ * Провайдер общения с Api
+ */
+public class ProviderApi {
 
-    private IntfServer api;
+    private final IntfApi api;
 
-    public RepoApi() {
-
+    public ProviderApi() {
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
         interceptor.setLevel(BuildConfig.DEBUG ? HttpLoggingInterceptor.Level.BODY : HttpLoggingInterceptor.Level.NONE);
 
@@ -22,16 +24,16 @@ public class RepoApi {
                 .build();
 
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(DefApi.baseUrl)
+                .baseUrl(DefApi.urlBase)
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(client)
                 .build();
 
-        api = retrofit.create(IntfServer.class);
+        api = retrofit.create(IntfApi.class);
     }
 
 
-    public IntfServer getApi() {
+    public IntfApi getApi() {
         return api;
     }
 

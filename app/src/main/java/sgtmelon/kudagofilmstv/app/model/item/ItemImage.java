@@ -1,4 +1,4 @@
-package sgtmelon.kudagofilmstv.app.model;
+package sgtmelon.kudagofilmstv.app.model.item;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -6,13 +6,16 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import sgtmelon.kudagofilmstv.office.annot.DefApi;
 
+/**
+ * Модель изображения
+ */
 public class ItemImage implements Parcelable {
 
-    @SerializedName(DefApi.image)
+    @SerializedName(DefApi.field_image)
     @Expose
     private String image;
 
-    public ItemImage(){
+    public ItemImage() {
 
     }
 
@@ -20,7 +23,7 @@ public class ItemImage implements Parcelable {
         this.image = image;
     }
 
-    protected ItemImage(Parcel in) {
+    private ItemImage(Parcel in) {
         image = in.readString();
     }
 

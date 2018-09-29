@@ -1,25 +1,27 @@
-package sgtmelon.kudagofilmstv.app.model;
+package sgtmelon.kudagofilmstv.app.model.repo;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import sgtmelon.kudagofilmstv.app.model.item.ItemFilm;
 import sgtmelon.kudagofilmstv.office.annot.DefApi;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Репозиторий фильма
+ */
 public class RepoFilm {
 
-    @SerializedName(DefApi.count)
+    @SerializedName(DefApi.field_count)
     @Expose
     private int count;
-    @SerializedName(DefApi.next)
+    @SerializedName(DefApi.field_next)
     @Expose
     private String next;
-    @SerializedName(DefApi.previous)
-    @Expose
-    private String previous;
-    @SerializedName(DefApi.results)
+
+    @SerializedName(DefApi.field_results)
     @Expose
     private List<ItemFilm> listFilm;
 
@@ -37,14 +39,6 @@ public class RepoFilm {
 
     public void setNext(String next) {
         this.next = next;
-    }
-
-    public String getPrevious() {
-        return previous;
-    }
-
-    public void setPrevious(String previous) {
-        this.previous = previous;
     }
 
     public List<ItemFilm> getListFilm() {

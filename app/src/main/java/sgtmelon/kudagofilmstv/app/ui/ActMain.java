@@ -6,6 +6,9 @@ import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import sgtmelon.kudagofilmstv.R;
 
+/**
+ * Активити главного менюю
+ */
 public class ActMain extends FragmentActivity {
 
     private static final String TAG = ActMain.class.getSimpleName();

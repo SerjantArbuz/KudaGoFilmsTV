@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import
+                alias="v"
+                type="android.view.View"/>
+
+        <variable
+                name="itemFilm"
+                type="sgtmelon.kudagofilmstv.app.model.item.ItemFilm"/>
+
+    </data>
+
+    <LinearLayout style="@style/Container.Main">
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+            <TextView
+                    style="@style/Text.Title"
+                    android:text='@{itemFilm.title}'
+                    tools:text="Остров собак"/>
+
+            <TextView
+                    style="@style/Text.Title"
+                    android:layout_marginStart="@dimen/layout_8dp"
+                    android:visibility='@{itemFilm.ageRestriction != null ? v.VISIBLE : v.GONE}'
+                    android:text='@{itemFilm.ageRestriction}'
+                    tools:text="16+"/>
+
+        </LinearLayout>
+
+        <TextView
+                style="@style/Text.Subtitle"
+                android:visibility='@{itemFilm.rating != null ? v.VISIBLE : v.GONE}'
+                android:text='@{"Рейтинг: " + itemFilm.rating}'
+                tools:text="Рейтинг: 9.0"/>
+
+        <LinearLayout style="@style/Container.Content">
+
+            <TextView
+                    style="@style/Text.Content"
+                    android:visibility='@{itemFilm.runningTime != null ? v.VISIBLE : v.GONE}'
+                    android:text='@{"Продолжительность: " + itemFilm.runningTime + " минут"}'
+                    tools:text="Продолжительность: 160 минут"/>
+
+            <TextView
+                    style="@style/Text.Content"
+                    android:visibility='@{itemFilm.year != null ? v.VISIBLE : v.GONE}'
+                    android:text='@{"Год: " + itemFilm.year}'
+                    tools:text="Год: 2018"/>
+
+            <TextView
+                    style="@style/Text.Content"
+                    android:visibility='@{itemFilm.country != null ? v.VISIBLE : v.GONE}'
+                    android:text='@{"Страна: " + itemFilm.country}'
+                    tools:text="Страна: США, Германия"/>
+
+            <TextView
+                    style="@style/Text.Content"
+                    android:visibility='@{itemFilm.director != null ? v.VISIBLE : v.GONE}'
+                    android:text='@{"Директов: " + itemFilm.director}'
+                    tools:text="Директов: Уэс Андерсон"/>
+
+            <TextView
+                    style="@style/Text.Content"
+                    android:visibility='@{itemFilm.writer != null ? v.VISIBLE : v.GONE}'
+                    android:text='@{"Сценарист: " + itemFilm.writer}'
+                    tools:text="Сценарист: Уэс Андерсон"/>
+
+            <TextView
+                    style="@style/Text.Content"
+                    android:visibility='@{itemFilm.stars != null ? v.VISIBLE : v.GONE}'
+                    android:text='@{"Актёры: " + itemFilm.stars}'
+                    tools:text="Актёры: Эдвард Бёрш, Ральф Фостер, Эндрю Вайсблум"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+                style="@style/Container.Content"
+                android:visibility='@{itemFilm.genres != null ? v.VISIBLE : v.GONE}'>
+
+            <TextView
+                    style="@style/Text.Content"
+                    android:text="@string/details_genres"
+                    android:textStyle="bold"/>
+
+            <TextView
+                    style="@style/Text.Subtitle"
+                    android:text='@{itemFilm.genres}'
+                    tools:text="мультфильм, фантастика, фэнтези, драма, комедия, приключения"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+                style="@style/Container.Content"
+                android:visibility='@{itemFilm.bodyText != null ? v.VISIBLE : v.GONE}'>
+
+            <TextView
+                    style="@style/Text.Content"
+                    android:text="@string/details_body_text"
+                    android:textStyle="bold"/>
+
+            <TextView
+                    style="@style/Text.Subtitle"
+                    android:text='@{itemFilm.bodyText}'
+                    tools:text="История 12-летнего мальчика Атари Кобаяши, опекаемого коррумпированным мэром Кобаяши. Когда по Указу последнего все домашние собаки города Мегасаки изгоняются на громадную свалку, Атари в одиночку отправляется на миниатюрном летательном аппарате на мусорный остров, чтобы найти своего верного пса по прозвищу Спотс. Там на острове вместе со стаей новых друзей-дворняг он начнет эпичное путешествие, которое решит будущую судьбу всей Префектуры."/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+</layout>
