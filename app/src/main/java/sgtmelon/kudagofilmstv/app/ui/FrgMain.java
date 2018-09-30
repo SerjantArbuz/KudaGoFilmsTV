@@ -10,12 +10,26 @@ import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v17.leanback.app.BackgroundManager;
 import android.support.v17.leanback.app.BrowseSupportFragment;
-import android.support.v17.leanback.widget.*;
+import android.support.v17.leanback.widget.ArrayObjectAdapter;
+import android.support.v17.leanback.widget.HeaderItem;
+import android.support.v17.leanback.widget.ListRow;
+import android.support.v17.leanback.widget.ListRowPresenter;
+import android.support.v17.leanback.widget.OnItemViewClickedListener;
+import android.support.v17.leanback.widget.OnItemViewSelectedListener;
+import android.support.v17.leanback.widget.Presenter;
+import android.support.v17.leanback.widget.Row;
+import android.support.v17.leanback.widget.RowPresenter;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.widget.Toast;
+
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
+
+import java.net.URI;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -26,16 +40,15 @@ import sgtmelon.kudagofilmstv.app.presenter.PresenterFilm;
 import sgtmelon.kudagofilmstv.app.provider.ProviderApi;
 import sgtmelon.kudagofilmstv.office.annot.DefIntent;
 
-import java.net.URI;
-import java.util.Timer;
-import java.util.TimerTask;
-
 /**
  * Фрагмент главного меню
  */
-public class FrgMain extends BrowseSupportFragment implements OnItemViewClickedListener, OnItemViewSelectedListener {
+public class FrgMain extends BrowseSupportFragment implements Callback<RepoFilm>,
+        OnItemViewClickedListener, OnItemViewSelectedListener {
 
     private static final String TAG = FrgMain.class.getSimpleName();
+
+    private final Handler handler = new Handler();
 
     private Context context;
     private ActMain activity;
@@ -44,6 +57,15 @@ public class FrgMain extends BrowseSupportFragment implements OnItemViewClickedL
 
     private ItemFilm selectedFilm;
     private long page = 1;
+
+    private BackgroundManager backgroundManager;
+    private Drawable backgroundDefault;
+    private int windowWidth, windowHeight;
+
+    private ArrayObjectAdapter adapter;
+    private PresenterFilm presenterFilm;
+
+    private Timer backgroundTimer;
 
     @Override
     public void onAttach(Context context) {
@@ -65,10 +87,19 @@ public class FrgMain extends BrowseSupportFragment implements OnItemViewClickedL
         setupAdapter();
 
         providerApi = new ProviderApi();
-        providerApi.getApi().getAll(page).enqueue(apiAllCallback);
+        providerApi.getApi().getAll(page).enqueue(this);
 
         setOnItemViewClickedListener(this);
         setOnItemViewSelectedListener(this);
+    }
+
+    @Override
+    public void onStop() {
+        Log.i(TAG, "onStop");
+
+        backgroundManager.release();
+
+        super.onStop();
     }
 
     @Override
@@ -82,15 +113,6 @@ public class FrgMain extends BrowseSupportFragment implements OnItemViewClickedL
         backgroundManager = null;
 
         super.onDestroy();
-    }
-
-    @Override
-    public void onStop() {
-        Log.i(TAG, "onStop");
-
-        backgroundManager.release();
-
-        super.onStop();
     }
 
     /**
@@ -107,11 +129,6 @@ public class FrgMain extends BrowseSupportFragment implements OnItemViewClickedL
         setBrandColor(getResources().getColor(R.color.background_fastlane));
         setSearchAffordanceColor(getResources().getColor(R.color.fab_search));
     }
-
-    private BackgroundManager backgroundManager;
-
-    private Drawable backgroundDefault;
-    private int windowWidth, windowHeight;
 
     /**
      * Установка фонового менеджера, для работы с обоями
@@ -132,9 +149,6 @@ public class FrgMain extends BrowseSupportFragment implements OnItemViewClickedL
         windowHeight = metrics.heightPixels;
     }
 
-    private ArrayObjectAdapter adapter;
-    private PresenterFilm presenterFilm;
-
     /**
      * Установка адаптера отображения данных
      */
@@ -148,47 +162,8 @@ public class FrgMain extends BrowseSupportFragment implements OnItemViewClickedL
     }
 
     /**
-     * Ответ Api
-     */
-    private final Callback<RepoFilm> apiAllCallback = new Callback<RepoFilm>() {
-
-        @Override
-        public void onResponse(Call<RepoFilm> call, Response<RepoFilm> response) {
-            Log.i(TAG, "onResponse");
-
-            if (response.body() != null) {
-                ArrayObjectAdapter objectAdapter = new ArrayObjectAdapter(presenterFilm);
-                HeaderItem headerItem = new HeaderItem(page - 1, "Страница " + page);
-
-                RepoFilm repoFilm = response.body();
-                for (ItemFilm itemFilm : repoFilm.getListFilmReverse()) {
-                    objectAdapter.add(itemFilm);
-                }
-
-                adapter.add(new ListRow(headerItem, objectAdapter));
-                adapter.notifyItemRangeChanged((int) page - 1, adapter.size());
-
-                if (repoFilm.getNext() != null) {
-                    Log.i(TAG, "onResponse: have next");
-
-                    providerApi.getApi().getAll(++page).enqueue(apiAllCallback);
-                }
-            }
-        }
-
-        @Override
-        public void onFailure(Call<RepoFilm> call, Throwable t) {
-            Log.i(TAG, "onFailure");
-
-            Toast.makeText(context, getString(R.string.error_internet), Toast.LENGTH_SHORT).show();
-        }
-
-    };
-
-    private Timer backgroundTimer;
-
-    /**
      * Старт таймера для смены обоев
+     *
      * @param delay - временная задержка
      */
     private void startBackgroundTimer(int delay) {
@@ -202,22 +177,9 @@ public class FrgMain extends BrowseSupportFragment implements OnItemViewClickedL
         backgroundTimer.schedule(new UpdateBackgroundTask(), delay);
     }
 
-    private final Handler handler = new Handler();
-
-    private class UpdateBackgroundTask extends TimerTask {
-        @Override
-        public void run() {
-            handler.post(() -> {
-                if (selectedFilm != null) {
-                    updateBackground(selectedFilm);
-                }
-            });
-        }
-
-    }
-
     /**
      * Смена обоев
+     *
      * @param itemFilm - модель фильма, от которой берутся обои
      */
     private void updateBackground(ItemFilm itemFilm) {
@@ -253,6 +215,37 @@ public class FrgMain extends BrowseSupportFragment implements OnItemViewClickedL
     }
 
     @Override
+    public void onResponse(Call<RepoFilm> call, Response<RepoFilm> response) {
+        Log.i(TAG, "onResponse");
+
+        if (response.body() != null) {
+            ArrayObjectAdapter objectAdapter = new ArrayObjectAdapter(presenterFilm);
+            HeaderItem headerItem = new HeaderItem(page - 1, "Страница " + page);
+
+            RepoFilm repoFilm = response.body();
+            for (ItemFilm itemFilm : repoFilm.getListFilm()) {
+                objectAdapter.add(itemFilm);
+            }
+
+            adapter.add(new ListRow(headerItem, objectAdapter));
+            adapter.notifyItemRangeChanged((int) page - 1, adapter.size());
+
+            if (repoFilm.getNext() != null) {
+                Log.i(TAG, "onResponse: have next");
+
+                providerApi.getApi().getAll(++page).enqueue(this);
+            }
+        }
+    }
+
+    @Override
+    public void onFailure(Call<RepoFilm> call, Throwable t) {
+        Log.i(TAG, "onFailure");
+
+        Toast.makeText(context, getString(R.string.error_internet), Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
     public void onItemClicked(Presenter.ViewHolder viewHolder, Object o, RowPresenter.ViewHolder viewHolder1, Row row) {
         Log.i(TAG, "onItemClicked: " + row.getHeaderItem().getId());
 
@@ -275,6 +268,18 @@ public class FrgMain extends BrowseSupportFragment implements OnItemViewClickedL
             selectedFilm = (ItemFilm) o;
             startBackgroundTimer(getResources().getInteger(R.integer.duration_background_change));
         }
+    }
+
+    private class UpdateBackgroundTask extends TimerTask {
+        @Override
+        public void run() {
+            handler.post(() -> {
+                if (selectedFilm != null) {
+                    updateBackground(selectedFilm);
+                }
+            });
+        }
+
     }
 
 }

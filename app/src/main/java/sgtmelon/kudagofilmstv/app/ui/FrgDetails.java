@@ -8,13 +8,31 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v17.leanback.app.BackgroundManager;
 import android.support.v17.leanback.app.DetailsSupportFragment;
-import android.support.v17.leanback.widget.*;
+import android.support.v17.leanback.widget.Action;
+import android.support.v17.leanback.widget.ArrayObjectAdapter;
+import android.support.v17.leanback.widget.ClassPresenterSelector;
+import android.support.v17.leanback.widget.DetailsOverviewRow;
+import android.support.v17.leanback.widget.FullWidthDetailsOverviewRowPresenter;
+import android.support.v17.leanback.widget.HeaderItem;
+import android.support.v17.leanback.widget.ListRow;
+import android.support.v17.leanback.widget.ListRowPresenter;
+import android.support.v17.leanback.widget.OnItemViewClickedListener;
+import android.support.v17.leanback.widget.Presenter;
+import android.support.v17.leanback.widget.Row;
+import android.support.v17.leanback.widget.RowPresenter;
+import android.support.v17.leanback.widget.SparseArrayObjectAdapter;
 import android.support.v4.content.ContextCompat;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.widget.Toast;
+
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
+
+import java.net.URI;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -28,22 +46,29 @@ import sgtmelon.kudagofilmstv.app.provider.ProviderApi;
 import sgtmelon.kudagofilmstv.office.annot.DefAction;
 import sgtmelon.kudagofilmstv.office.annot.DefIntent;
 
-import java.net.URI;
-import java.util.Timer;
-import java.util.TimerTask;
-
 /**
  * Фрагмент детальной информации
  */
-public class FrgDetails extends DetailsSupportFragment implements OnItemViewClickedListener {
+public class FrgDetails extends DetailsSupportFragment implements Callback<RepoFilm>, OnItemViewClickedListener {
 
     private static final String TAG = FrgDetails.class.getSimpleName();
+
+    private final Handler handler = new Handler();
 
     private Context context;
     private ActDetails activity;
 
     private ItemFilm selectedFilm;
     private long page;
+
+    private BackgroundManager backgroundManager;
+    private Drawable backgroundDefault;
+    private int windowWidth, windowHeight;
+
+    private ArrayObjectAdapter adapter;
+    private PresenterFilm presenterFilm;
+
+    private Timer backgroundTimer;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -76,7 +101,7 @@ public class FrgDetails extends DetailsSupportFragment implements OnItemViewClic
         setupDetailsOverviewRow();
 
         ProviderApi providerApi = new ProviderApi();
-        providerApi.getApi().getAll(page).enqueue(apiAllCallback);
+        providerApi.getApi().getAll(page).enqueue(this);
 
         setOnItemViewClickedListener(this);
     }
@@ -103,11 +128,6 @@ public class FrgDetails extends DetailsSupportFragment implements OnItemViewClic
         super.onStop();
     }
 
-    private BackgroundManager backgroundManager;
-
-    private Drawable backgroundDefault;
-    private int windowWidth, windowHeight;
-
     /**
      * Установка фонового менеджера, для работы с обоями
      */
@@ -126,9 +146,6 @@ public class FrgDetails extends DetailsSupportFragment implements OnItemViewClic
         windowWidth = metrics.widthPixels;
         windowHeight = metrics.heightPixels;
     }
-
-    private ArrayObjectAdapter adapter;
-    private PresenterFilm presenterFilm;
 
     /**
      * Установка адаптера отображения данных
@@ -174,42 +191,6 @@ public class FrgDetails extends DetailsSupportFragment implements OnItemViewClic
     }
 
     /**
-     * Ответ Api
-     */
-    private final Callback<RepoFilm> apiAllCallback = new Callback<RepoFilm>() {
-
-        @Override
-        public void onResponse(Call<RepoFilm> call, Response<RepoFilm> response) {
-            Log.i(TAG, "onResponse");
-
-            if (response.body() != null) {
-                ArrayObjectAdapter objectAdapter = new ArrayObjectAdapter(presenterFilm);
-                HeaderItem headerItem = new HeaderItem(0, "Страница " + page);
-
-                RepoFilm repoFilm = response.body();
-                for (ItemFilm itemFilm : repoFilm.getListFilmReverse()) {
-                    if (itemFilm.getId() != selectedFilm.getId()) {
-                        objectAdapter.add(itemFilm);
-                    }
-                }
-
-                adapter.add(new ListRow(headerItem, objectAdapter));
-                adapter.notifyItemRangeChanged(0, adapter.size());
-            }
-        }
-
-        @Override
-        public void onFailure(Call<RepoFilm> call, Throwable t) {
-            Log.i(TAG, "onFailure");
-
-            Toast.makeText(context, getString(R.string.error_internet), Toast.LENGTH_SHORT).show();
-        }
-
-    };
-
-    private Timer backgroundTimer;
-
-    /**
      * Старт таймера для смены обоев
      */
     private void startBackgroundTimer() {
@@ -223,23 +204,9 @@ public class FrgDetails extends DetailsSupportFragment implements OnItemViewClic
         backgroundTimer.schedule(new UpdateBackgroundTask(), getResources().getInteger(R.integer.duration_background_update));
     }
 
-    private final Handler handler = new Handler();
-
-    private class UpdateBackgroundTask extends TimerTask {
-        @Override
-        public void run() {
-            Log.i(TAG, "run");
-
-            handler.post(() -> {
-                if (selectedFilm != null) {
-                    updateBackground(selectedFilm);
-                }
-            });
-        }
-    }
-
     /**
      * Смена обоев
+     *
      * @param itemFilm - модель фильма, от которой берутся обои
      */
     private void updateBackground(ItemFilm itemFilm) {
@@ -275,6 +242,42 @@ public class FrgDetails extends DetailsSupportFragment implements OnItemViewClic
     }
 
     @Override
+    public void onSaveInstanceState(Bundle outState) {
+        Log.i(TAG, "onSaveInstanceState");
+        super.onSaveInstanceState(outState);
+
+        outState.putParcelable(DefIntent.FILM, selectedFilm);
+        outState.putLong(DefIntent.PAGE, page);
+    }
+
+    @Override
+    public void onResponse(Call<RepoFilm> call, Response<RepoFilm> response) {
+        Log.i(TAG, "onResponse");
+
+        if (response.body() != null) {
+            ArrayObjectAdapter objectAdapter = new ArrayObjectAdapter(presenterFilm);
+            HeaderItem headerItem = new HeaderItem(0, "Страница " + page);
+
+            RepoFilm repoFilm = response.body();
+            for (ItemFilm itemFilm : repoFilm.getListFilm()) {
+                if (itemFilm.getId() != selectedFilm.getId()) {
+                    objectAdapter.add(itemFilm);
+                }
+            }
+
+            adapter.add(new ListRow(headerItem, objectAdapter));
+            adapter.notifyItemRangeChanged(0, adapter.size());
+        }
+    }
+
+    @Override
+    public void onFailure(Call<RepoFilm> call, Throwable t) {
+        Log.i(TAG, "onFailure");
+
+        Toast.makeText(context, getString(R.string.error_internet), Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
     public void onItemClicked(Presenter.ViewHolder viewHolder, Object o, RowPresenter.ViewHolder viewHolder1, Row row) {
         Log.i(TAG, "onItemClicked");
 
@@ -289,13 +292,17 @@ public class FrgDetails extends DetailsSupportFragment implements OnItemViewClic
         }
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        Log.i(TAG, "onSaveInstanceState");
-        super.onSaveInstanceState(outState);
+    private class UpdateBackgroundTask extends TimerTask {
+        @Override
+        public void run() {
+            Log.i(TAG, "run");
 
-        outState.putParcelable(DefIntent.FILM, selectedFilm);
-        outState.putLong(DefIntent.PAGE, page);
+            handler.post(() -> {
+                if (selectedFilm != null) {
+                    updateBackground(selectedFilm);
+                }
+            });
+        }
     }
 
 }

@@ -4,6 +4,7 @@ import android.databinding.DataBindingUtil;
 import android.support.v17.leanback.widget.Presenter;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
+
 import sgtmelon.kudagofilmstv.R;
 import sgtmelon.kudagofilmstv.app.model.item.ItemFilm;
 import sgtmelon.kudagofilmstv.databinding.ItemDetailsBinding;

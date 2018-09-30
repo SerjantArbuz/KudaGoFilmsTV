@@ -32,7 +32,6 @@ public class ProviderApi {
         api = retrofit.create(IntfApi.class);
     }
 
-
     public IntfApi getApi() {
         return api;
     }

@@ -11,24 +11,26 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+
 import com.squareup.picasso.Picasso;
-import sgtmelon.kudagofilmstv.R;
-import sgtmelon.kudagofilmstv.app.model.item.ItemFilm;
 
 import java.net.URI;
+
+import sgtmelon.kudagofilmstv.R;
+import sgtmelon.kudagofilmstv.app.model.item.ItemFilm;
 
 /**
  * Презентер логотипа фильма
  */
 public class PresenterLogo extends DetailsOverviewLogoPresenter {
 
-    private final Drawable logoDefault;
+    private final Drawable icDefault;
     private final int logoWidth, logoHeight;
 
     public PresenterLogo(Context context) {
         Resources res = context.getResources();
 
-        logoDefault = res.getDrawable(R.drawable.ic_default, null);
+        icDefault = res.getDrawable(R.drawable.ic_default, null);
 
         logoWidth = res.getDimensionPixelSize(R.dimen.detail_thumb_width);
         logoHeight = res.getDimensionPixelSize(R.dimen.detail_thumb_height);
@@ -59,11 +61,11 @@ public class PresenterLogo extends DetailsOverviewLogoPresenter {
                             .load(uri.toString())
                             .resize(logoWidth, logoHeight)
                             .centerCrop()
-                            .placeholder(logoDefault)
-                            .error(logoDefault)
+                            .placeholder(icDefault)
+                            .error(icDefault)
                             .into(imageView);
                 } else {
-                    imageView.setImageDrawable(logoDefault);
+                    imageView.setImageDrawable(icDefault);
                 }
 
                 if (isBoundToImage((ViewHolder) viewHolder, row)) {
