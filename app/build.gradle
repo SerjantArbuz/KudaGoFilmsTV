@@ -27,15 +27,22 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    def sup_ver = "28.0.0"
+    def x_ver = "1.0.0"
 
-    implementation "com.android.support:leanback-v17:$sup_ver"
-    implementation "com.android.support:preference-leanback-v17:$sup_ver"
-    implementation "com.android.support:exifinterface:$sup_ver"
+    implementation "androidx.leanback:leanback:$x_ver"
+    implementation "androidx.leanback:leanback-preference:$x_ver"
+    implementation "androidx.exifinterface:exifinterface:$x_ver"
 
-    def pic_ver = "2.71828"
+    def arch_ver = "2.0.0-rc01"
 
-    implementation "com.squareup.picasso:picasso:$pic_ver"
+    implementation "androidx.lifecycle:lifecycle-extensions:$arch_ver"
+    annotationProcessor "androidx.lifecycle:lifecycle-compiler:$arch_ver"
+
+    def dag_ver = "2.13"
+
+    implementation  "com.google.dagger:dagger:$dag_ver"
+    annotationProcessor "com.google.dagger:dagger-compiler:$dag_ver"
+    annotationProcessor "com.google.dagger:dagger-android-processor:$dag_ver"
 
     def ret_ver = "2.1.0"
 
@@ -45,5 +52,9 @@ dependencies {
     def ok_ver = "3.9.0"
 
     implementation "com.squareup.okhttp3:logging-interceptor:$ok_ver"
+
+    def pic_ver = "2.71828"
+
+    implementation "com.squareup.picasso:picasso:$pic_ver"
 
 }

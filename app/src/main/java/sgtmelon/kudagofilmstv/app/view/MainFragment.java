@@ -1,69 +1,60 @@
-package sgtmelon.kudagofilmstv.app.ui;
+package sgtmelon.kudagofilmstv.app.view;
 
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.Nullable;
-import android.support.v17.leanback.app.BackgroundManager;
-import android.support.v17.leanback.app.BrowseSupportFragment;
-import android.support.v17.leanback.widget.ArrayObjectAdapter;
-import android.support.v17.leanback.widget.HeaderItem;
-import android.support.v17.leanback.widget.ListRow;
-import android.support.v17.leanback.widget.ListRowPresenter;
-import android.support.v17.leanback.widget.OnItemViewClickedListener;
-import android.support.v17.leanback.widget.OnItemViewSelectedListener;
-import android.support.v17.leanback.widget.Presenter;
-import android.support.v17.leanback.widget.Row;
-import android.support.v17.leanback.widget.RowPresenter;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.widget.Toast;
-
+import androidx.annotation.Nullable;
+import androidx.leanback.app.BackgroundManager;
+import androidx.leanback.app.BrowseSupportFragment;
+import androidx.leanback.widget.*;
+import androidx.lifecycle.ViewModelProviders;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
+import sgtmelon.kudagofilmstv.R;
+import sgtmelon.kudagofilmstv.app.injection.ComponentApi;
+import sgtmelon.kudagofilmstv.app.injection.DaggerComponentApi;
+import sgtmelon.kudagofilmstv.app.model.item.ItemFilm;
+import sgtmelon.kudagofilmstv.app.provider.ProviderApi;
+import sgtmelon.kudagofilmstv.app.vm.MainViewModel;
+import sgtmelon.kudagofilmstv.office.def.DefIntent;
+import sgtmelon.kudagofilmstv.office.intf.IntfApi;
 
+import javax.inject.Inject;
 import java.net.URI;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import sgtmelon.kudagofilmstv.R;
-import sgtmelon.kudagofilmstv.app.model.item.ItemFilm;
-import sgtmelon.kudagofilmstv.app.model.repo.RepoFilm;
-import sgtmelon.kudagofilmstv.app.presenter.PresenterFilm;
-import sgtmelon.kudagofilmstv.app.provider.ProviderApi;
-import sgtmelon.kudagofilmstv.office.annot.DefIntent;
-
 /**
  * Фрагмент главного меню
  */
-public class FrgMain extends BrowseSupportFragment implements Callback<RepoFilm>,
+public final class MainFragment extends BrowseSupportFragment implements IntfApi.LoadPage,
         OnItemViewClickedListener, OnItemViewSelectedListener {
 
-    private static final String TAG = FrgMain.class.getSimpleName();
+    private static final String TAG = MainFragment.class.getSimpleName();
 
     private final Handler handler = new Handler();
 
     private Context context;
-    private ActMain activity;
+    private Activity activity;
 
-    private ProviderApi providerApi;
+    @Inject
+    ProviderApi providerApi;
 
     private ItemFilm selectedFilm;
-    private long page = 1;
 
     private BackgroundManager backgroundManager;
     private Drawable backgroundDefault;
     private int windowWidth, windowHeight;
 
-    private ArrayObjectAdapter adapter;
-    private PresenterFilm presenterFilm;
+    private final ArrayObjectAdapter adapter = new ArrayObjectAdapter(new ListRowPresenter());
 
     private Timer backgroundTimer;
 
@@ -73,6 +64,7 @@ public class FrgMain extends BrowseSupportFragment implements Callback<RepoFilm>
         super.onAttach(context);
 
         this.context = context;
+        activity = getActivity();
     }
 
     @Override
@@ -80,14 +72,19 @@ public class FrgMain extends BrowseSupportFragment implements Callback<RepoFilm>
         Log.i(TAG, "onActivityCreated");
         super.onActivityCreated(savedInstanceState);
 
-        activity = (ActMain) getActivity();
+        ComponentApi componentApi = DaggerComponentApi.builder().build();
+        componentApi.inject(this);
+
+        MainViewModel vm = ViewModelProviders.of(this).get(MainViewModel.class);
+        vm.setProviderApi(providerApi);
+        vm.setLoadPage(this);
 
         setupUI();
         setupBackgroundManager();
-        setupAdapter();
 
-        providerApi = new ProviderApi();
-        providerApi.getApi().getAll(page).enqueue(this);
+        setAdapter(adapter);
+
+        vm.startLoadPage();
 
         setOnItemViewClickedListener(this);
         setOnItemViewSelectedListener(this);
@@ -110,6 +107,7 @@ public class FrgMain extends BrowseSupportFragment implements Callback<RepoFilm>
             backgroundTimer.cancel();
             backgroundTimer = null;
         }
+
         backgroundManager = null;
 
         super.onDestroy();
@@ -147,18 +145,6 @@ public class FrgMain extends BrowseSupportFragment implements Callback<RepoFilm>
 
         windowWidth = metrics.widthPixels;
         windowHeight = metrics.heightPixels;
-    }
-
-    /**
-     * Установка адаптера отображения данных
-     */
-    private void setupAdapter() {
-        Log.i(TAG, "setupAdapter");
-
-        presenterFilm = new PresenterFilm(context);
-
-        adapter = new ArrayObjectAdapter(new ListRowPresenter());
-        setAdapter(adapter);
     }
 
     /**
@@ -215,32 +201,16 @@ public class FrgMain extends BrowseSupportFragment implements Callback<RepoFilm>
     }
 
     @Override
-    public void onResponse(Call<RepoFilm> call, Response<RepoFilm> response) {
-        Log.i(TAG, "onResponse");
+    public void onSuccessfully(long page, ListRow listRow) {
+        Log.i(TAG, "onSuccessfully");
 
-        if (response.body() != null) {
-            ArrayObjectAdapter objectAdapter = new ArrayObjectAdapter(presenterFilm);
-            HeaderItem headerItem = new HeaderItem(page - 1, "Страница " + page);
-
-            RepoFilm repoFilm = response.body();
-            for (ItemFilm itemFilm : repoFilm.getListFilm()) {
-                objectAdapter.add(itemFilm);
-            }
-
-            adapter.add(new ListRow(headerItem, objectAdapter));
-            adapter.notifyItemRangeChanged((int) page - 1, adapter.size());
-
-            if (repoFilm.getNext() != null) {
-                Log.i(TAG, "onResponse: have next");
-
-                providerApi.getApi().getAll(++page).enqueue(this);
-            }
-        }
+        adapter.add(listRow);
+        adapter.notifyItemRangeChanged((int) page - 1, adapter.size());
     }
 
     @Override
-    public void onFailure(Call<RepoFilm> call, Throwable t) {
-        Log.i(TAG, "onFailure");
+    public void onError() {
+        Log.i(TAG, "onError");
 
         Toast.makeText(context, getString(R.string.error_internet), Toast.LENGTH_SHORT).show();
     }
@@ -250,11 +220,12 @@ public class FrgMain extends BrowseSupportFragment implements Callback<RepoFilm>
         Log.i(TAG, "onItemClicked: " + row.getHeaderItem().getId());
 
         if (o instanceof ItemFilm) {
-            ItemFilm itemFilm = (ItemFilm) o;
+            long id = ((ItemFilm) o).getId();
+            long page = row.getHeaderItem().getId() + 1;
 
-            Intent intent = new Intent(activity, ActDetails.class);
-            intent.putExtra(DefIntent.FILM, itemFilm);
-            intent.putExtra(DefIntent.PAGE, row.getHeaderItem().getId() + 1);
+            Intent intent = new Intent(activity, DetailsActivity.class);
+            intent.putExtra(DefIntent.ID, id);
+            intent.putExtra(DefIntent.PAGE, page);
 
             activity.startActivity(intent);
         }

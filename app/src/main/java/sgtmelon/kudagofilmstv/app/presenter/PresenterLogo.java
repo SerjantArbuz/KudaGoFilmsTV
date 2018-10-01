@@ -3,42 +3,44 @@ package sgtmelon.kudagofilmstv.app.presenter;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
-import android.support.v17.leanback.widget.DetailsOverviewLogoPresenter;
-import android.support.v17.leanback.widget.DetailsOverviewRow;
-import android.support.v17.leanback.widget.FullWidthDetailsOverviewRowPresenter;
-import android.support.v17.leanback.widget.Presenter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-
+import androidx.leanback.widget.DetailsOverviewLogoPresenter;
+import androidx.leanback.widget.DetailsOverviewRow;
+import androidx.leanback.widget.FullWidthDetailsOverviewRowPresenter;
+import androidx.leanback.widget.Presenter;
 import com.squareup.picasso.Picasso;
-
-import java.net.URI;
-
 import sgtmelon.kudagofilmstv.R;
 import sgtmelon.kudagofilmstv.app.model.item.ItemFilm;
+
+import java.net.URI;
 
 /**
  * Презентер логотипа фильма
  */
-public class PresenterLogo extends DetailsOverviewLogoPresenter {
+public final class PresenterLogo extends DetailsOverviewLogoPresenter {
+
+    private final Context context;
 
     private final Drawable icDefault;
     private final int logoWidth, logoHeight;
 
     public PresenterLogo(Context context) {
+        this.context = context;
+
         Resources res = context.getResources();
-
         icDefault = res.getDrawable(R.drawable.ic_default, null);
-
         logoWidth = res.getDimensionPixelSize(R.dimen.detail_thumb_width);
         logoHeight = res.getDimensionPixelSize(R.dimen.detail_thumb_height);
     }
 
     @Override
     public Presenter.ViewHolder onCreateViewHolder(ViewGroup parent) {
-        ImageView imageView = (ImageView) LayoutInflater.from(parent.getContext()).inflate(R.layout.lb_fullwidth_details_overview_logo, parent, false);
+        ImageView imageView = (ImageView) LayoutInflater
+                .from(context)
+                .inflate(R.layout.lb_fullwidth_details_overview_logo, parent, false);
 
         imageView.setLayoutParams(new ViewGroup.LayoutParams(logoWidth, logoHeight));
         imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);

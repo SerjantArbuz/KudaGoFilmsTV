@@ -2,6 +2,7 @@
 <resources>
 
     <color name="ic_launcher_background">#e83c3c</color>
+
     <color name="fab_search">#e83c3c</color>
 
     <color name="background_default_start">#272727</color>

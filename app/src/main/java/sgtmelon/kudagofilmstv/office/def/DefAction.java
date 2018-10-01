@@ -1,6 +1,6 @@
-package sgtmelon.kudagofilmstv.office.annot;
+package sgtmelon.kudagofilmstv.office.def;
 
-import android.support.annotation.IntDef;
+import androidx.annotation.IntDef;
 
 /**
  * Аннотации для меню действий

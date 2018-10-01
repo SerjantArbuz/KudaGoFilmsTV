@@ -1,159 +1,74 @@
 package sgtmelon.kudagofilmstv.app.model.item;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import sgtmelon.kudagofilmstv.office.def.DefApi;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-
-import sgtmelon.kudagofilmstv.office.annot.DefApi;
+import java.util.List;
 
 /**
  * Модель фильма
  */
-public class ItemFilm implements Parcelable {
+public final class ItemFilm {
 
-    public static final Creator<ItemFilm> CREATOR = new Creator<ItemFilm>() {
-        @Override
-        public ItemFilm createFromParcel(Parcel in) {
-            return new ItemFilm(in);
-        }
-
-        @Override
-        public ItemFilm[] newArray(int size) {
-            return new ItemFilm[size];
-        }
-    };
-
-    @SerializedName(DefApi.field_f_id)
+    @SerializedName(DefApi.field_id )
     @Expose
     private long id;
-    @SerializedName(DefApi.field_f_siteUrl)
+    @SerializedName(DefApi.field_site_url )
     @Expose
     private String siteUrl;
-    @SerializedName(DefApi.field_f_title)
+    @SerializedName(DefApi.field_title )
     @Expose
     private String title;
-    @SerializedName(DefApi.field_f_bodyText)
+    @SerializedName(DefApi.field_bodyText )
     @Expose
     private String bodyText;
-    @SerializedName(DefApi.field_f_genres)
+    @SerializedName(DefApi.field_genres )
     @Expose
-    private ItemGenre[] genres;
-    @SerializedName(DefApi.field_f_country)
+    private List<ItemGenre> genres;
+    @SerializedName(DefApi.field_country )
     @Expose
     private String country;
-    @SerializedName(DefApi.field_f_year)
+    @SerializedName(DefApi.field_year )
     @Expose
     private String year;
-    @SerializedName(DefApi.field_f_runningTime)
+    @SerializedName(DefApi.field_runningTime )
     @Expose
     private String runningTime;
-    @SerializedName(DefApi.field_f_ageRestriction)
+    @SerializedName(DefApi.field_ageRestriction )
     @Expose
     private String ageRestriction;
-    @SerializedName(DefApi.field_f_stars)
+    @SerializedName(DefApi.field_start )
     @Expose
     private String stars;
-    @SerializedName(DefApi.field_f_director)
+    @SerializedName(DefApi.field_director )
     @Expose
     private String director;
-    @SerializedName(DefApi.field_f_writer)
+    @SerializedName(DefApi.field_writer )
     @Expose
     private String writer;
-    @SerializedName(DefApi.field_f_trailer)
+    @SerializedName(DefApi.field_trailer )
     @Expose
     private String trailer;
-    @SerializedName(DefApi.field_f_poster)
+    @SerializedName(DefApi.field_images )
+    @Expose
+    private List<ItemImage> images;
+    private int ps;
+    @SerializedName(DefApi.field_poster )
     @Expose
     private ItemImage poster;
-    @SerializedName(DefApi.field_f_images)
+    @SerializedName(DefApi.field_imdbRating )
     @Expose
-    private ItemImage[] images;
-    private int ps;
-    @SerializedName(DefApi.field_f_imdbRating)
-    @Expose
-    private String rating;
-
-    private ItemFilm(Parcel in) {
-        id = in.readLong();
-        siteUrl = in.readString();
-
-        title = in.readString();
-        bodyText = in.readString();
-
-        Parcelable[] temp = in.readParcelableArray(ItemFilm.class.getClassLoader());
-        if (temp != null) {
-            genres = new ItemGenre[temp.length];
-            for (int i = 0; i < temp.length; i++) {
-                genres[i] = (ItemGenre) temp[i];
-            }
-        } else genres = null;
-
-        country = in.readString();
-        year = in.readString();
-        runningTime = in.readString();
-        ageRestriction = in.readString();
-
-        stars = in.readString();
-        director = in.readString();
-        writer = in.readString();
-
-        trailer = in.readString();
-
-        temp = in.readParcelableArray(ItemFilm.class.getClassLoader());
-        if (temp != null) {
-            images = new ItemImage[temp.length];
-            for (int i = 0; i < temp.length; i++) {
-                images[i] = (ItemImage) temp[i];
-            }
-        } else images = null;
-        ps = in.readInt();
-
-        poster = in.readParcelable(ItemFilm.class.getClassLoader());
-
-        rating = in.readString();
-    }
-
-    @Override
-    public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeLong(id);
-        parcel.writeString(siteUrl);
-
-        parcel.writeString(title);
-        parcel.writeString(bodyText);
-
-        parcel.writeParcelableArray(genres, i);
-
-        parcel.writeString(country);
-        parcel.writeString(year);
-        parcel.writeString(runningTime);
-        parcel.writeString(ageRestriction);
-
-        parcel.writeString(stars);
-        parcel.writeString(director);
-        parcel.writeString(writer);
-
-        parcel.writeString(trailer);
-
-        parcel.writeParcelableArray(images, i);
-        parcel.writeInt(ps);
-
-        parcel.writeParcelable(poster, i);
-
-        parcel.writeString(rating);
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
+    private String imdbRating;
 
     public long getId() {
         return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public URI getSiteUrl() {
@@ -164,17 +79,29 @@ public class ItemFilm implements Parcelable {
         }
     }
 
+    public void setSiteUrl(String siteUrl) {
+        this.siteUrl = siteUrl;
+    }
+
     public String getTitle() {
         return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getBodyText() {
         return bodyText;
     }
 
+    public void setBodyText(String bodyText) {
+        this.bodyText = bodyText;
+    }
+
     public String getGenres() {
         StringBuilder gen = null;
-        if (genres != null && genres.length != 0) {
+        if (genres != null && genres.size() != 0) {
             gen = new StringBuilder();
             for (ItemGenre itemGenre : genres) {
                 gen.append(itemGenre.getName());
@@ -185,16 +112,32 @@ public class ItemFilm implements Parcelable {
         return gen != null ? gen.toString() : null;
     }
 
+    public void setGenres(List<ItemGenre> genres) {
+        this.genres = genres;
+    }
+
     public String getCountry() {
         return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
     }
 
     public String getYear() {
         return year;
     }
 
+    public void setYear(String year) {
+        this.year = year;
+    }
+
     public String getRunningTime() {
         return runningTime;
+    }
+
+    public void setRunningTime(String runningTime) {
+        this.runningTime = runningTime;
     }
 
     public String getAgeRestriction() {
@@ -204,16 +147,32 @@ public class ItemFilm implements Parcelable {
         return ageRestriction;
     }
 
+    public void setAgeRestriction(String ageRestriction) {
+        this.ageRestriction = ageRestriction;
+    }
+
     public String getStars() {
         return stars;
+    }
+
+    public void setStars(String stars) {
+        this.stars = stars;
     }
 
     public String getDirector() {
         return director;
     }
 
+    public void setDirector(String director) {
+        this.director = director;
+    }
+
     public String getWriter() {
         return writer;
+    }
+
+    public void setWriter(String writer) {
+        this.writer = writer;
     }
 
     public URI getTrailer() {
@@ -222,6 +181,10 @@ public class ItemFilm implements Parcelable {
         } catch (URISyntaxException e) {
             return null;
         }
+    }
+
+    public void setTrailer(String trailer) {
+        this.trailer = trailer;
     }
 
     public URI getPoster() {
@@ -235,10 +198,14 @@ public class ItemFilm implements Parcelable {
         return null;
     }
 
+    public void setPoster(ItemImage poster) {
+        this.poster = poster;
+    }
+
     public URI getImages() {
-        if (images != null && images.length != 0) {
-            ItemImage image = images[ps];
-            ps = ++ps % images.length;
+        if (images != null && images.size() != 0) {
+            ItemImage image = images.get(ps);
+            ps = ++ps % images.size();
 
             try {
                 return new URI(image.getImage());
@@ -249,15 +216,27 @@ public class ItemFilm implements Parcelable {
         return null;
     }
 
+    public void setImages(List<ItemImage> images) {
+        this.images = images;
+    }
+
     public int getPs() {
         return ps;
     }
 
-    public String getRating() {
-        if (rating != null && rating.equals("0.0")) {
+    public void setPs(int ps) {
+        this.ps = ps;
+    }
+
+    public String getImdbRating() {
+        if (imdbRating != null && imdbRating.equals("0.0")) {
             return null;
         }
-        return rating;
+        return imdbRating;
+    }
+
+    public void setImdbRating(String imdbRating) {
+        this.imdbRating = imdbRating;
     }
 
 }

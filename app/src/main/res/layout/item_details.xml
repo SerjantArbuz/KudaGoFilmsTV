@@ -37,8 +37,8 @@
 
         <TextView
                 style="@style/Text.Subtitle"
-                android:visibility='@{itemFilm.rating != null ? v.VISIBLE : v.GONE}'
-                android:text='@{"Рейтинг: " + itemFilm.rating}'
+                android:visibility='@{itemFilm.imdbRating != null ? v.VISIBLE : v.GONE}'
+                android:text='@{"Рейтинг: " + itemFilm.imdbRating}'
                 tools:text="Рейтинг: 9.0"/>
 
         <LinearLayout style="@style/Container.Content">

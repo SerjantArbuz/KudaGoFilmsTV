@@ -10,4 +10,10 @@
 
     <string name="error_internet">Ошибка при подключении к серверу</string>
 
+    <string name="details_genres">Жарны:</string>
+    <string name="details_body_text">Описание:</string>
+
+    <string name="info_rating_none">Без рейтинга</string>
+    <string name="info_rating_have">Рейтинг:</string>
+
 </resources>

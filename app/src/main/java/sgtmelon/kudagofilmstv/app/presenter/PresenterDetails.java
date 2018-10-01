@@ -1,10 +1,9 @@
 package sgtmelon.kudagofilmstv.app.presenter;
 
-import android.databinding.DataBindingUtil;
-import android.support.v17.leanback.widget.Presenter;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
-
+import androidx.databinding.DataBindingUtil;
+import androidx.leanback.widget.Presenter;
 import sgtmelon.kudagofilmstv.R;
 import sgtmelon.kudagofilmstv.app.model.item.ItemFilm;
 import sgtmelon.kudagofilmstv.databinding.ItemDetailsBinding;
@@ -12,7 +11,7 @@ import sgtmelon.kudagofilmstv.databinding.ItemDetailsBinding;
 /**
  * Презентер для детальной информации о фильме
  */
-public class PresenterDetails extends Presenter {
+public final class PresenterDetails extends Presenter {
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup) {
@@ -35,7 +34,7 @@ public class PresenterDetails extends Presenter {
 
     }
 
-    class DetailsViewHolder extends Presenter.ViewHolder {
+    static class DetailsViewHolder extends Presenter.ViewHolder {
 
         private final ItemDetailsBinding binding;
 

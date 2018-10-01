@@ -2,9 +2,9 @@
 <fragment
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/actMain_frg"
+        android:id="@+id/main_fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:name="sgtmelon.kudagofilmstv.app.ui.FrgMain"
-        tools:context=".app.ui.ActMain"
+        android:name="sgtmelon.kudagofilmstv.app.view.MainFragment"
+        tools:context=".app.view.MainActivity"
         tools:deviceIds="tv"/>

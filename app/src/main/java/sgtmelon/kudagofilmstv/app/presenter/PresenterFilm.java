@@ -3,11 +3,11 @@ package sgtmelon.kudagofilmstv.app.presenter;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
-import android.support.annotation.ColorInt;
-import android.support.v17.leanback.widget.BaseCardView;
-import android.support.v17.leanback.widget.ImageCardView;
-import android.support.v17.leanback.widget.Presenter;
-import android.support.v4.content.ContextCompat;
+import androidx.annotation.ColorInt;
+import androidx.leanback.widget.BaseCardView;
+import androidx.leanback.widget.ImageCardView;
+import androidx.leanback.widget.Presenter;
+import androidx.core.content.ContextCompat;
 import android.view.ViewGroup;
 
 import com.squareup.picasso.Picasso;
@@ -20,7 +20,9 @@ import sgtmelon.kudagofilmstv.app.model.item.ItemFilm;
 /**
  * Презентер для карточки фильма
  */
-public class PresenterFilm extends Presenter {
+public final class PresenterFilm extends Presenter {
+
+    private final Context context;
 
     private final Drawable icDefault;
     private final int cardWidth, cardHeight;
@@ -29,6 +31,8 @@ public class PresenterFilm extends Presenter {
     private final int clBackgroundDefault, clBackgroundSelected;
 
     public PresenterFilm(Context context) {
+        this.context = context;
+
         Resources res = context.getResources();
 
         icDefault = context.getDrawable(R.drawable.ic_default);
@@ -89,7 +93,7 @@ public class PresenterFilm extends Presenter {
         }
 
         cardView.setTitleText(itemFilm.getTitle());
-        cardView.setContentText(itemFilm.getRating() == null ? "Без рейтинга" : "Рейтинг: " + itemFilm.getRating());
+        cardView.setContentText(itemFilm.getImdbRating() == null ? context.getString(R.string.info_rating_none) : context.getString(R.string.info_rating_have) + itemFilm.getImdbRating());
     }
 
     @Override
