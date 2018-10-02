@@ -4,8 +4,6 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import sgtmelon.kudagofilmstv.office.def.DefApi;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
 
 /**
@@ -13,53 +11,53 @@ import java.util.List;
  */
 public final class ItemFilm {
 
-    @SerializedName(DefApi.field_id )
+    @SerializedName(DefApi.field_id)
     @Expose
     private long id;
-    @SerializedName(DefApi.field_site_url )
+    @SerializedName(DefApi.field_site_url)
     @Expose
     private String siteUrl;
-    @SerializedName(DefApi.field_title )
+    @SerializedName(DefApi.field_title)
     @Expose
     private String title;
-    @SerializedName(DefApi.field_bodyText )
+    @SerializedName(DefApi.field_bodyText)
     @Expose
     private String bodyText;
-    @SerializedName(DefApi.field_genres )
+    @SerializedName(DefApi.field_genres)
     @Expose
     private List<ItemGenre> genres;
-    @SerializedName(DefApi.field_country )
+    @SerializedName(DefApi.field_country)
     @Expose
     private String country;
-    @SerializedName(DefApi.field_year )
+    @SerializedName(DefApi.field_year)
     @Expose
     private String year;
-    @SerializedName(DefApi.field_runningTime )
+    @SerializedName(DefApi.field_runningTime)
     @Expose
     private String runningTime;
-    @SerializedName(DefApi.field_ageRestriction )
+    @SerializedName(DefApi.field_ageRestriction)
     @Expose
     private String ageRestriction;
-    @SerializedName(DefApi.field_start )
+    @SerializedName(DefApi.field_start)
     @Expose
     private String stars;
-    @SerializedName(DefApi.field_director )
+    @SerializedName(DefApi.field_director)
     @Expose
     private String director;
-    @SerializedName(DefApi.field_writer )
+    @SerializedName(DefApi.field_writer)
     @Expose
     private String writer;
-    @SerializedName(DefApi.field_trailer )
+    @SerializedName(DefApi.field_trailer)
     @Expose
     private String trailer;
-    @SerializedName(DefApi.field_images )
+    @SerializedName(DefApi.field_images)
     @Expose
     private List<ItemImage> images;
     private int ps;
-    @SerializedName(DefApi.field_poster )
+    @SerializedName(DefApi.field_poster)
     @Expose
     private ItemImage poster;
-    @SerializedName(DefApi.field_imdbRating )
+    @SerializedName(DefApi.field_imdbRating)
     @Expose
     private String imdbRating;
 
@@ -71,12 +69,8 @@ public final class ItemFilm {
         this.id = id;
     }
 
-    public URI getSiteUrl() {
-        try {
-            return new URI(siteUrl);
-        } catch (URISyntaxException e) {
-            return null;
-        }
+    public String getSiteUrl() {
+        return siteUrl;
     }
 
     public void setSiteUrl(String siteUrl) {
@@ -99,17 +93,8 @@ public final class ItemFilm {
         this.bodyText = bodyText;
     }
 
-    public String getGenres() {
-        StringBuilder gen = null;
-        if (genres != null && genres.size() != 0) {
-            gen = new StringBuilder();
-            for (ItemGenre itemGenre : genres) {
-                gen.append(itemGenre.getName());
-                gen.append(", ");
-            }
-            gen.delete(gen.length() - 2, gen.length());
-        }
-        return gen != null ? gen.toString() : null;
+    public List<ItemGenre> getGenres() {
+        return genres;
     }
 
     public void setGenres(List<ItemGenre> genres) {
@@ -141,9 +126,6 @@ public final class ItemFilm {
     }
 
     public String getAgeRestriction() {
-        if (ageRestriction != null && ageRestriction.equals("0")) {
-            return null;
-        }
         return ageRestriction;
     }
 
@@ -175,45 +157,24 @@ public final class ItemFilm {
         this.writer = writer;
     }
 
-    public URI getTrailer() {
-        try {
-            return new URI(trailer);
-        } catch (URISyntaxException e) {
-            return null;
-        }
+    public String getTrailer() {
+        return trailer;
     }
 
     public void setTrailer(String trailer) {
         this.trailer = trailer;
     }
 
-    public URI getPoster() {
-        if (poster != null) {
-            try {
-                return new URI(poster.getImage());
-            } catch (URISyntaxException e) {
-                return null;
-            }
-        }
-        return null;
+    public ItemImage getPoster() {
+        return poster;
     }
 
     public void setPoster(ItemImage poster) {
         this.poster = poster;
     }
 
-    public URI getImages() {
-        if (images != null && images.size() != 0) {
-            ItemImage image = images.get(ps);
-            ps = ++ps % images.size();
-
-            try {
-                return new URI(image.getImage());
-            } catch (URISyntaxException e) {
-                return null;
-            }
-        }
-        return null;
+    public List<ItemImage> getImages() {
+        return images;
     }
 
     public void setImages(List<ItemImage> images) {
@@ -229,9 +190,6 @@ public final class ItemFilm {
     }
 
     public String getImdbRating() {
-        if (imdbRating != null && imdbRating.equals("0.0")) {
-            return null;
-        }
         return imdbRating;
     }
 

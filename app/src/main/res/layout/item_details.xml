@@ -29,7 +29,7 @@
             <TextView
                     style="@style/Text.Title"
                     android:layout_marginStart="@dimen/layout_8dp"
-                    android:visibility='@{itemFilm.ageRestriction != null ? v.VISIBLE : v.GONE}'
+                    android:visibility='@{itemFilm.ageRestriction != null ? (!itemFilm.ageRestriction.equals("0") ? v.VISIBLE : v.GONE) : v.GONE}'
                     android:text='@{itemFilm.ageRestriction}'
                     tools:text="16+"/>
 
@@ -37,7 +37,7 @@
 
         <TextView
                 style="@style/Text.Subtitle"
-                android:visibility='@{itemFilm.imdbRating != null ? v.VISIBLE : v.GONE}'
+                android:visibility='@{itemFilm.imdbRating != null ? (!itemFilm.imdbRating.equals("0.0") ? v.VISIBLE : v.GONE) : v.GONE}'
                 android:text='@{"Рейтинг: " + itemFilm.imdbRating}'
                 tools:text="Рейтинг: 9.0"/>
 
@@ -83,7 +83,7 @@
 
         <LinearLayout
                 style="@style/Container.Content"
-                android:visibility='@{itemFilm.genres != null ? v.VISIBLE : v.GONE}'>
+                android:visibility='@{itemFilm.genres != null &amp;&amp; itemFilm.genres.size() != 0 ? v.VISIBLE : v.GONE}'>
 
             <TextView
                     style="@style/Text.Content"
@@ -91,8 +91,8 @@
                     android:textStyle="bold"/>
 
             <TextView
+                    android:id="@+id/genres_text"
                     style="@style/Text.Subtitle"
-                    android:text='@{itemFilm.genres}'
                     tools:text="мультфильм, фантастика, фэнтези, драма, комедия, приключения"/>
 
         </LinearLayout>

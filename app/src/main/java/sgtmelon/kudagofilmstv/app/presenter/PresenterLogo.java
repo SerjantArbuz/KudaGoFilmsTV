@@ -7,15 +7,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+
+import com.squareup.picasso.Picasso;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import androidx.leanback.widget.DetailsOverviewLogoPresenter;
 import androidx.leanback.widget.DetailsOverviewRow;
 import androidx.leanback.widget.FullWidthDetailsOverviewRowPresenter;
 import androidx.leanback.widget.Presenter;
-import com.squareup.picasso.Picasso;
 import sgtmelon.kudagofilmstv.R;
 import sgtmelon.kudagofilmstv.app.model.item.ItemFilm;
-
-import java.net.URI;
+import sgtmelon.kudagofilmstv.app.model.item.ItemImage;
 
 /**
  * Презентер логотипа фильма
@@ -57,15 +61,20 @@ public final class PresenterLogo extends DetailsOverviewLogoPresenter {
             if (row.getItem() instanceof ItemFilm) {
                 ItemFilm itemFilm = (ItemFilm) row.getItem();
 
-                URI uri = itemFilm.getPoster();
-                if (uri != null) {
-                    Picasso.get()
-                            .load(uri.toString())
-                            .resize(logoWidth, logoHeight)
-                            .centerCrop()
-                            .placeholder(icDefault)
-                            .error(icDefault)
-                            .into(imageView);
+                ItemImage itemImage = itemFilm.getPoster();
+                if (itemImage != null) {
+                    try {
+                        URI uri = new URI(itemImage.getImage());
+                        Picasso.get()
+                                .load(uri.toString())
+                                .resize(logoWidth, logoHeight)
+                                .centerCrop()
+                                .placeholder(icDefault)
+                                .error(icDefault)
+                                .into(imageView);
+                    } catch (URISyntaxException e) {
+                        imageView.setImageDrawable(icDefault);
+                    }
                 } else {
                     imageView.setImageDrawable(icDefault);
                 }
@@ -78,7 +87,7 @@ public final class PresenterLogo extends DetailsOverviewLogoPresenter {
         }
     }
 
-    static class ViewHolder extends DetailsOverviewLogoPresenter.ViewHolder {
+    private static final class ViewHolder extends DetailsOverviewLogoPresenter.ViewHolder {
         ViewHolder(View view) {
             super(view);
         }

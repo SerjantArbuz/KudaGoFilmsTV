@@ -21,6 +21,7 @@ import sgtmelon.kudagofilmstv.R;
 import sgtmelon.kudagofilmstv.app.injection.ComponentApi;
 import sgtmelon.kudagofilmstv.app.injection.DaggerComponentApi;
 import sgtmelon.kudagofilmstv.app.model.item.ItemFilm;
+import sgtmelon.kudagofilmstv.app.model.item.ItemImage;
 import sgtmelon.kudagofilmstv.app.presenter.PresenterDetails;
 import sgtmelon.kudagofilmstv.app.presenter.PresenterLogo;
 import sgtmelon.kudagofilmstv.app.provider.ProviderApi;
@@ -31,6 +32,8 @@ import sgtmelon.kudagofilmstv.office.intf.IntfApi;
 
 import javax.inject.Inject;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -43,6 +46,14 @@ public final class DetailsFragment extends DetailsSupportFragment implements Int
     private static final String TAG = DetailsFragment.class.getSimpleName();
 
     private final Handler handler = new Handler();
+    private final Runnable runnable = new Runnable() {
+        @Override
+        public void run() {
+            if (selectedFilm != null) {
+                updateBackground();
+            }
+        }
+    };
 
     private Context context;
     private Activity activity;
@@ -131,6 +142,7 @@ public final class DetailsFragment extends DetailsSupportFragment implements Int
         }
 
         backgroundManager = null;
+        handler.removeCallbacks(runnable);
 
         super.onDestroy();
     }
@@ -177,7 +189,9 @@ public final class DetailsFragment extends DetailsSupportFragment implements Int
         detailsPresenter.setBackgroundColor(ContextCompat.getColor(activity, R.color.background_details));
         detailsPresenter.setActionsBackgroundColor(ContextCompat.getColor(activity, R.color.background_action));
         detailsPresenter.setInitialState(FullWidthDetailsOverviewRowPresenter.STATE_HALF);
-        detailsPresenter.setOnActionClickedListener(action -> Toast.makeText(context, action.toString(), Toast.LENGTH_SHORT).show());
+        detailsPresenter.setOnActionClickedListener(
+                action -> Toast.makeText(context, action.toString(), Toast.LENGTH_SHORT).show()
+        );
 
         //Презентер для разных типов отображаемых данных
         ClassPresenterSelector presenterSelector = new ClassPresenterSelector();
@@ -204,43 +218,56 @@ public final class DetailsFragment extends DetailsSupportFragment implements Int
 
     /**
      * Смена обоев
-     *
-     * @param itemFilm - модель фильма, от которой берутся обои
      */
-    private void updateBackground(ItemFilm itemFilm) {
-        Log.i(TAG, "updateBackground: ps=" + itemFilm.getPs());
+    private void updateBackground() {
+        Log.i(TAG, "updateBackground");
 
-        URI uri = itemFilm.getImages();
-        if (uri != null) {
-            Picasso.get()
-                    .load(uri.toString())
-                    .resize(windowWidth, windowHeight)
-                    .centerCrop()
-                    .error(backgroundDefault)
-                    .placeholder(backgroundDefault)
-                    .into(new Target() {
-                        @Override
-                        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                            backgroundManager.setBitmap(bitmap);
-                        }
+        List<ItemImage> listImage = selectedFilm.getImages();
+        int ps = selectedFilm.getPs();
 
-                        @Override
-                        public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+        if (listImage != null && listImage.size() != 0) {
+            ItemImage image = listImage.get(ps);
 
-                        }
+            ps = ++ps % listImage.size();
+            selectedFilm.setPs(ps);
 
-                        @Override
-                        public void onPrepareLoad(Drawable placeHolderDrawable) {
+            try {
+                URI uri = new URI(image.getImage());
+                Picasso.get()
+                        .load(uri.toString())
+                        .resize(windowWidth, windowHeight)
+                        .centerCrop()
+                        .error(backgroundDefault)
+                        .placeholder(backgroundDefault)
+                        .into(new Target() {
+                            @Override
+                            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                                backgroundManager.setBitmap(bitmap);
+                            }
 
-                        }
-                    });
+                            @Override
+                            public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+
+                            }
+
+                            @Override
+                            public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+                            }
+                        });
+            } catch (URISyntaxException e) {
+                backgroundManager.setDrawable(backgroundDefault);
+            }
+        } else {
+            backgroundManager.setDrawable(backgroundDefault);
         }
 
         startBackgroundTimer();
     }
 
     @Override
-    public void onItemClicked(Presenter.ViewHolder viewHolder, Object o, RowPresenter.ViewHolder viewHolder1, Row row) {
+    public void onItemClicked(Presenter.ViewHolder viewHolder, Object o,
+                              RowPresenter.ViewHolder viewHolder1, Row row) {
         Log.i(TAG, "onItemClicked");
 
         if (o instanceof ItemFilm) {
@@ -291,16 +318,11 @@ public final class DetailsFragment extends DetailsSupportFragment implements Int
         Toast.makeText(context, getString(R.string.error_internet), Toast.LENGTH_SHORT).show();
     }
 
-    private class UpdateBackgroundTask extends TimerTask {
+    private final class UpdateBackgroundTask extends TimerTask {
         @Override
         public void run() {
             Log.i(TAG, "run");
-
-            handler.post(() -> {
-                if (selectedFilm != null) {
-                    updateBackground(selectedFilm);
-                }
-            });
+            handler.post(runnable);
         }
     }
 

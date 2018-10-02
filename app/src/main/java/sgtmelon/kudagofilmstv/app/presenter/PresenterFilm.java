@@ -3,19 +3,19 @@ package sgtmelon.kudagofilmstv.app.presenter;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
+import android.view.ViewGroup;
 import androidx.annotation.ColorInt;
+import androidx.core.content.ContextCompat;
 import androidx.leanback.widget.BaseCardView;
 import androidx.leanback.widget.ImageCardView;
 import androidx.leanback.widget.Presenter;
-import androidx.core.content.ContextCompat;
-import android.view.ViewGroup;
-
 import com.squareup.picasso.Picasso;
-
-import java.net.URI;
-
 import sgtmelon.kudagofilmstv.R;
 import sgtmelon.kudagofilmstv.app.model.item.ItemFilm;
+import sgtmelon.kudagofilmstv.app.model.item.ItemImage;
+
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * Презентер для карточки фильма
@@ -79,15 +79,20 @@ public final class PresenterFilm extends Presenter {
 
         cardView.setMainImageDimensions(cardWidth, cardHeight);
 
-        URI uri = itemFilm.getPoster();
-        if (uri != null) {
-            Picasso.get()
-                    .load(uri.toString())
-                    .resize(cardWidth, cardHeight)
-                    .placeholder(icDefault)
-                    .error(icDefault)
-                    .centerCrop()
-                    .into(cardView.getMainImageView());
+        ItemImage itemImage = itemFilm.getPoster();
+        if (itemImage != null) {
+            try {
+                URI uri = new URI(itemImage.getImage());
+                Picasso.get()
+                        .load(uri.toString())
+                        .resize(cardWidth, cardHeight)
+                        .placeholder(icDefault)
+                        .error(icDefault)
+                        .centerCrop()
+                        .into(cardView.getMainImageView());
+            } catch (URISyntaxException e) {
+                cardView.setMainImage(icDefault);
+            }
         } else {
             cardView.setMainImage(icDefault);
         }

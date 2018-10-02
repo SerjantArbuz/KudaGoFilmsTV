@@ -22,6 +22,7 @@ import sgtmelon.kudagofilmstv.R;
 import sgtmelon.kudagofilmstv.app.injection.ComponentApi;
 import sgtmelon.kudagofilmstv.app.injection.DaggerComponentApi;
 import sgtmelon.kudagofilmstv.app.model.item.ItemFilm;
+import sgtmelon.kudagofilmstv.app.model.item.ItemImage;
 import sgtmelon.kudagofilmstv.app.provider.ProviderApi;
 import sgtmelon.kudagofilmstv.app.vm.MainViewModel;
 import sgtmelon.kudagofilmstv.office.def.DefIntent;
@@ -29,6 +30,8 @@ import sgtmelon.kudagofilmstv.office.intf.IntfApi;
 
 import javax.inject.Inject;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -41,6 +44,14 @@ public final class MainFragment extends BrowseSupportFragment implements IntfApi
     private static final String TAG = MainFragment.class.getSimpleName();
 
     private final Handler handler = new Handler();
+    private final Runnable runnable = new Runnable() {
+        @Override
+        public void run() {
+            if (selectedFilm != null) {
+                updateBackground();
+            }
+        }
+    };
 
     private Context context;
     private Activity activity;
@@ -109,6 +120,7 @@ public final class MainFragment extends BrowseSupportFragment implements IntfApi
         }
 
         backgroundManager = null;
+        handler.removeCallbacks(runnable);
 
         super.onDestroy();
     }
@@ -165,36 +177,48 @@ public final class MainFragment extends BrowseSupportFragment implements IntfApi
 
     /**
      * Смена обоев
-     *
-     * @param itemFilm - модель фильма, от которой берутся обои
      */
-    private void updateBackground(ItemFilm itemFilm) {
-        Log.i(TAG, "updateBackground: ps=" + itemFilm.getPs());
+    private void updateBackground() {
+        Log.i(TAG, "updateBackground");
 
-        URI uri = itemFilm.getImages();
-        if (uri != null) {
-            Picasso.get()
-                    .load(uri.toString())
-                    .resize(windowWidth, windowHeight)
-                    .centerCrop()
-                    .error(backgroundDefault)
-                    .placeholder(backgroundDefault)
-                    .into(new Target() {
-                        @Override
-                        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                            backgroundManager.setBitmap(bitmap);
-                        }
+        List<ItemImage> listImage = selectedFilm.getImages();
+        int ps = selectedFilm.getPs();
 
-                        @Override
-                        public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+        if (listImage != null && listImage.size() != 0) {
+            ItemImage image = listImage.get(ps);
 
-                        }
+            ps = ++ps % listImage.size();
+            selectedFilm.setPs(ps);
 
-                        @Override
-                        public void onPrepareLoad(Drawable placeHolderDrawable) {
+            try {
+                URI uri = new URI(image.getImage());
+                Picasso.get()
+                        .load(uri.toString())
+                        .resize(windowWidth, windowHeight)
+                        .centerCrop()
+                        .error(backgroundDefault)
+                        .placeholder(backgroundDefault)
+                        .into(new Target() {
+                            @Override
+                            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                                backgroundManager.setBitmap(bitmap);
+                            }
 
-                        }
-                    });
+                            @Override
+                            public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+
+                            }
+
+                            @Override
+                            public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+                            }
+                        });
+            } catch (URISyntaxException e) {
+                backgroundManager.setDrawable(backgroundDefault);
+            }
+        } else {
+            backgroundManager.setDrawable(backgroundDefault);
         }
 
         startBackgroundTimer(getResources().getInteger(R.integer.duration_background_update));
@@ -216,7 +240,8 @@ public final class MainFragment extends BrowseSupportFragment implements IntfApi
     }
 
     @Override
-    public void onItemClicked(Presenter.ViewHolder viewHolder, Object o, RowPresenter.ViewHolder viewHolder1, Row row) {
+    public void onItemClicked(Presenter.ViewHolder viewHolder, Object o,
+                              RowPresenter.ViewHolder viewHolder1, Row row) {
         Log.i(TAG, "onItemClicked: " + row.getHeaderItem().getId());
 
         if (o instanceof ItemFilm) {
@@ -232,7 +257,8 @@ public final class MainFragment extends BrowseSupportFragment implements IntfApi
     }
 
     @Override
-    public void onItemSelected(Presenter.ViewHolder viewHolder, Object o, RowPresenter.ViewHolder viewHolder1, Row row) {
+    public void onItemSelected(Presenter.ViewHolder viewHolder, Object o,
+                               RowPresenter.ViewHolder viewHolder1, Row row) {
         Log.i(TAG, "onItemSelected");
 
         if (o instanceof ItemFilm) {
@@ -241,14 +267,10 @@ public final class MainFragment extends BrowseSupportFragment implements IntfApi
         }
     }
 
-    private class UpdateBackgroundTask extends TimerTask {
+    private final class UpdateBackgroundTask extends TimerTask {
         @Override
         public void run() {
-            handler.post(() -> {
-                if (selectedFilm != null) {
-                    updateBackground(selectedFilm);
-                }
-            });
+            handler.post(runnable);
         }
 
     }
